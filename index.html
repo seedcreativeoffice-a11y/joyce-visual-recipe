@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>喬伊思 · AI 提味配方 · Visual Recipe</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:#F5F3EE;color:#1A1614;font-family:system-ui,-apple-system,"PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#0D0D10}::-webkit-scrollbar-thumb{background:#2A2A30;border-radius:3px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes bounceIn{0%{transform:scale(.6) translateY(12px);opacity:0}70%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
+.bounce-in{animation:bounceIn .4s cubic-bezier(.2,.8,.3,1) both}
+button{cursor:pointer;font-family:inherit;transition:all .18s ease}
+button:active{transform:scale(.97)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="module">
+const JOYCE_IMG = "data:image/webp;base64,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";
+// ═══ 商品靜物 × 6 範例 ═══
+const CAT_PRODUCT = {
+  id:"product", color:"#C9874A", bg:"#FDF6EC", border:"rgba(201,135,74,.2)",
+  name:"商品靜物", nameEn:"Product & Still Life",
+  tagline:"主體 × 材質 × 光線控制",
+  ratios:["1:1","4:5","16:9"],
+  icon:`<svg width="44" height="44" viewBox="0 0 48 48" fill="none"><rect x="14" y="18" width="20" height="26" rx="3" stroke="white" stroke-width="1.5"/><rect x="18" y="14" width="12" height="7" rx="2" stroke="white" stroke-width="1.5"/><line x1="24" y1="8" x2="24" y2="14" stroke="white" stroke-width="1.5"/><line x1="14" y1="24" x2="34" y2="24" stroke="white" stroke-width="1.2"/><line x1="14" y1="38" x2="34" y2="38" stroke="white" stroke-width="1.2"/><circle cx="24" cy="31" r="3" stroke="white" stroke-width="1.2"/></svg>`,
+  variants:[
+    { title:"美妝保養品", badge:"精品棚拍",
+      ratio:"1:1",
+      keyZh:"精緻乳霜罐，大理石台座，米白香檳金色調，左側單一柔光燈箱，右側輕微補光，包裝表面帶細膩反光，四分之三側角，淺景深",
+      keyEn:"Luxury cream jar on marble platform, beige champagne palette, single softbox from left, gentle fill from right, delicate surface reflections, 3/4 angle, shallow depth of field",
+      fullZh:"主體：精緻乳霜罐，置中於柔和大理石台座，極簡奢華包裝，不露品牌字樣\n色彩：柔米白、象牙白、香檳金——高端奢華色調\n背景：柔焦奢華室內背景，細膩散景，輕盈陰影，無縫漸層\n光線：左側單一柔光燈箱為主光，右側輕微補光板，包裝表面帶細膩金色反光，避免死黑\n構圖：置中英雄鏡頭，微微四分之三側角，淺景深虛化背景\n技術：Hasselblad 85mm f/2.8，棚拍柔光箱，4K，不含文字\n負向詞：模糊、過曝、凌亂背景、顯示品牌logo、低品質",
+      fullEn:"Subject: Luxury cream jar centered on soft marble platform, minimal elegant packaging, no brand text\nColors: Soft beige, ivory white, champagne gold — premium luxury tones\nBackground: Blurred soft-focus luxury interior, subtle bokeh, gentle shadows\nLighting: Single softbox from left as key light, gentle fill reflector from right, delicate gold surface reflections, no dead shadows\nComposition: Centered hero shot, slight 3/4 angle, shallow depth of field\nTechnical: Hasselblad 85mm f/2.8, studio softbox, 4K, no text overlay\nNegative: blurry, overexposed, cluttered background, brand logo, low quality",
+      layers:[
+        {label:"① 主體描述",color:"#C9874A",keyZh:"精緻乳霜罐，置中於柔和大理石台座，極簡奢華包裝，不露品牌字樣",keyEn:"Luxury cream jar, centered on marble platform, minimal elegant packaging, no visible brand text",teach:"主體要給三個資訊：材質感、位置、道具平台。越具體，AI 越不會自由發揮。",joyce:"「主體」是 AI 的第一眼！給它材質感、位置、道具，比說「好看的產品」有用一百倍。"},
+        {label:"② 色彩氛圍",color:"#A8C9A0",keyZh:"柔米白、象牙白、香檳金——高端奢華色調",keyEn:"Soft beige, ivory white, champagne gold — premium luxury tones",teach:"直接點名顏色名稱＋氛圍詞。Champagne gold（香檳金）比直接說 gold 更柔和、不刺眼。",joyce:"直接點顏色名稱給 AI！「香檳金」比「金色」更柔和，這種細節差很多。"},
+        {label:"③ 光線打法",color:"#7A9EC9",keyZh:"左側單一柔光燈箱為主光，右側輕微補光，包裝表面帶細膩金色反光",keyEn:"Single softbox from left as key light, gentle fill from right, delicate gold surface reflections",teach:"商品打光的關鍵是「有方向感的光」——指定光從哪邊來（left side），AI 才能生成有立體感的陰影。補光板（fill reflector）讓暗面不死黑，同時保留立體感。",joyce:"商品光要有方向感！指定左側主光 + 右側補光，AI 才能生成有立體陰影的商品，而不是四面均勻的平光。"},
+        {label:"④ 構圖視角",color:"#A07AC9",keyZh:"置中英雄鏡頭，微微四分之三側角，淺景深虛化背景",keyEn:"Centered hero shot, slight 3/4 angle, shallow depth of field",teach:"3/4 angle 是商品攝影黃金角度——比正面立體、比側面完整。淺景深讓背景自動模糊。",joyce:"四分之三側角是商品攝影的黃金角度——比正面立體，比側面完整，記住這個！"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"Hasselblad 85mm f/2.8，棚拍柔光箱，4K；負向詞：模糊、過曝、凌亂背景",keyEn:"Hasselblad 85mm f/2.8, studio softbox, 4K — Negative: blurry, overexposed, cluttered",teach:"點名相機品牌（Hasselblad）讓 AI 往高端靠；負向詞排掉 AI 最容易犯的毛病。",joyce:"技術標籤是「畫質保險」！Hasselblad 讓 AI 往高端靠，負向詞幫你排掉它最常犯的毛病。"}
+      ]},
+    { title:"手沖咖啡", badge:"飲食攝影",
+      ratio:"4:5",
+      keyZh:"手沖咖啡傾倒瞬間，絲滑咖啡絲帶流動，白色厚壁陶瓷杯，木製托盤，左側窗邊自然散射光，蒸氣升騰，暖黃底片色調",
+      keyEn:"Pour-over coffee being poured, silky ribbon of coffee, white ceramic cup, wooden tray, soft diffused window light from left, steam rising, warm film tone",
+      fullZh:"主體：手沖咖啡傾倒瞬間，絲滑咖啡絲帶流動，白色厚壁陶瓷杯\n道具：溫潤木製托盤，咖啡豆散落，亞麻布，咖啡師工具\n光線：左側窗邊自然散射光為主，無強光，蒸氣在逆光中可見，暖黃色溫\n構圖：平視微仰角，傾倒動作成主體，動態感\n色調：底片式暖調調色，輕微去飽和\n技術：Canon R5 50mm f/1.8，慢快門捕捉液體流動\n負向詞：廉價感、過度飽和、失焦、雜亂背景",
+      fullEn:"Subject: Pour-over coffee being poured, silky ribbon of coffee flowing, thick-walled white ceramic cup\nProps: Warm wooden tray, scattered coffee beans, linen cloth, barista tools\nLighting: Soft diffused window light from left as key, no harsh light, steam visible against backlight, warm color temperature\nComposition: Eye-level slight low angle, pouring action as hero, dynamic feel\nGrade: Film-like warm color grade, slightly desaturated\nTechnical: Canon R5 50mm f/1.8, slow shutter capturing liquid flow\nNegative: cheap feel, over-saturated, motion blur, cluttered background",
+      layers:[
+        {label:"① 主體動態",color:"#C9874A",keyZh:"手沖咖啡傾倒瞬間，絲滑咖啡絲帶流動，白色厚壁陶瓷杯",keyEn:"Pour-over coffee being poured, silky ribbon of coffee flowing, thick-walled white ceramic cup",teach:"飲品攝影要捕捉「動態瞬間」——ribbon of coffee（咖啡絲帶）是描述液體流動的精準詞，讓 AI 生成有動態感的傾倒瞬間。",joyce:"飲品攝影要捕捉動態瞬間！Ribbon of coffee 是描述液體流動的精準詞，讓 AI 生成絲滑的傾倒瞬間，不是靜止的咖啡杯。"},
+        {label:"② 道具佈景",color:"#A8C9A0",keyZh:"溫潤木製托盤，咖啡豆散落，亞麻布——生活感道具組合",keyEn:"Warm wooden tray, scattered coffee beans, linen cloth",teach:"咖啡場景的道具要有「故事感」——scattered coffee beans（散落咖啡豆）暗示了整個製作過程，讓畫面有敘事深度。",joyce:"咖啡道具要有故事感！散落的咖啡豆暗示了整個製作過程，讓畫面不只是一杯咖啡，而是一個有溫度的生活場景。"},
+        {label:"③ 光線打法",color:"#7A9EC9",keyZh:"左側窗邊自然散射光，無強光，蒸氣在逆光中可見，暖黃色溫",keyEn:"Soft diffused window light from left, no harsh light, steam visible against backlight, warm color temperature",teach:"咖啡攝影的光要「軟、有方向、有溫度」——soft diffused（柔和散射）讓光均勻不刺眼；蒸氣在逆光中可見是讓整個場景感覺「剛沖好」的點睛之筆。",joyce:"咖啡攝影的光要軟又有溫度！Soft diffused window light 讓光均勻柔和，蒸氣在逆光中可見讓整個場景感覺剛沖好、熱氣騰騰。"},
+        {label:"④ 構圖角度",color:"#A07AC9",keyZh:"平視微仰角，傾倒動作成主體，動態感",keyEn:"Eye-level slight low angle, pouring action as hero element, dynamic feel",teach:"傾倒動作要用平視或微仰角——從側面平視最能看到液體流動的弧度，稍微仰角讓傾倒的壺更有力量感。",joyce:"傾倒動作要用平視！從側面才能看到液體流動的完整弧度，這個角度最能呈現倒咖啡的優雅感。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"Canon R5 50mm f/1.8，慢快門；負向詞：廉價感、失焦、過度飽和",keyEn:"Canon R5 50mm f/1.8, slow shutter — Negative: cheap feel, motion blur, over-saturated",teach:"慢快門（slow shutter）讓液體流動呈現絲滑感，但負向詞要加 motion blur 防止 AI 把整張圖都模糊掉。",joyce:"慢快門是飲品攝影的秘密武器！讓液體流動絲滑，但記得在負向詞加 motion blur，不然 AI 可能把整張圖都模糊了。"}
+      ]},
+    { title:"精品珠寶", badge:"靜物攝影",
+      ratio:"1:1",
+      keyZh:"鑽石戒指，黑色絲絨展示台，正上方精準點光源聚焦刻面，折射彩虹光芒，無補光強對比，微距特寫",
+      keyEn:"Diamond ring on black velvet stand, precise top spot light focused on facets, rainbow refraction, no fill high contrast, macro close-up",
+      fullZh:"主體：鑽石戒指，置中於黑色絲絨展示台，精緻金屬戒台，不含品牌字樣\n色彩：深黑絲絨背景，鑽石折射彩虹光芒，金屬暖金調\n光線：正上方精準點光源為唯一光源，聚焦鑽石刻面，不加補光，保留強烈明暗對比，折射彩虹光芒\n構圖：微距特寫，鑽石置中，刻面清晰可見，極淺景深\n技術：Macro 微距鏡頭 f/4，精準棚拍，4K\n負向詞：模糊刻面、廉價感、假珠寶感、補光太強失去對比",
+      fullEn:"Subject: Diamond ring on black velvet display stand, delicate metal setting, no brand text\nColors: Deep black velvet background, diamond refracting rainbow light, warm gold metal tones\nLighting: Single precise top spot light as only light source, focused on diamond facets, no fill light, strong contrast preserved, rainbow refraction\nComposition: Macro close-up, diamond centered, facets clearly visible, very shallow depth of field\nTechnical: Macro lens f/4, precise studio setup, 4K\nNegative: blurry facets, cheap feel, fake jewelry look, over-filled losing contrast",
+      layers:[
+        {label:"① 主體描述",color:"#C9874A",keyZh:"鑽石戒指，置中於黑色絲絨展示台，精緻金屬戒台",keyEn:"Diamond ring, centered on black velvet display stand, delicate metal setting",teach:"珠寶主體要強調「展示道具」——黑色絲絨是珠寶攝影的標準材質，它的質感讓鑽石更閃耀。",joyce:"珠寶攝影的道具很關鍵！黑色絲絨展示台讓鑽石更閃耀，換成白色就整個不對了。"},
+        {label:"② 色彩氛圍",color:"#A8C9A0",keyZh:"深黑絲絨背景，鑽石折射彩虹光芒，金屬暖金調",keyEn:"Deep black velvet background, diamond refracting rainbow light, warm gold metal tones",teach:"珠寶攝影配色公式：深黑背景（讓鑽石發光）+ rainbow refraction（彩虹折射）+ 金屬暖金。三個元素缺一不可。",joyce:"珠寶配色公式：深黑背景讓鑽石發光，rainbow refraction 讓 AI 生成那個閃爍彩虹——這個詞是關鍵！"},
+        {label:"③ 光線打法",color:"#7A9EC9",keyZh:"正上方精準點光源，唯一光源，不加補光，保留強烈明暗對比，讓刻面各自折射",keyEn:"Single precise top spot light as only source, no fill light, strong contrast, each facet refracting independently",teach:"珠寶打光要用「唯一點光源、不補光」——補光會讓鑽石失去刻面的明暗差異，讓每個刻面看起來一樣亮，反而失去閃耀感。點光源 + 無補光 = 最強烈的折射效果。",joyce:"珠寶要用唯一點光源、不補光！補光讓刻面失去明暗差異，點光源 + 無補光才能讓每個刻面各自折射出彩虹光芒。"},
+        {label:"④ 構圖視角",color:"#A07AC9",keyZh:"微距特寫，鑽石置中，刻面清晰可見，極淺景深",keyEn:"Macro close-up, diamond centered, facets clearly visible, very shallow depth of field",teach:"珠寶攝影要用 macro（微距）——普通鏡頭拍不出鑽石刻面的清晰細節，刻面是珠寶的賣點，必須清晰可見。",joyce:"珠寶一定要用 macro 微距！普通鏡頭根本拍不出鑽石刻面的細節，模糊了就垮了。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"Macro 微距鏡頭 f/4；負向詞：模糊刻面、廉價感、假珠寶感",keyEn:"Macro lens f/4 — Negative: blurry facets, cheap feel, fake jewelry look",teach:"珠寶攝影技術：f/4（讓更多刻面清晰）+ 負向詞必須加 fake jewelry look，防止 AI 畫出玩具珠寶感。",joyce:"珠寶負向詞一定要加 fake jewelry look！不加的話 AI 很容易畫出那種玩具店塑膠珠寶感，完全毀掉整張圖。"}
+      ]},
+    { title:"香水瓶", badge:"奢品攝影",
+      ratio:"4:5",
+      keyZh:"晶瑩剔透香水瓶，深色木質台座，左後方逆光打亮瓶身輪廓，右側輕微補光，液體呈現琥珀色透光感，玫瑰花瓣散落",
+      keyEn:"Crystal clear perfume bottle on dark wooden base, rim light from left rear highlighting bottle silhouette, gentle right fill, amber liquid glowing, rose petals scattered",
+      fullZh:"主體：晶瑩剔透香水瓶，置中於深色木質台座，精緻金屬瓶蓋\n色彩：深棕木質底、琥珀金液體、玫瑰粉點綴\n光線：左後方逆光為主光，打亮瓶身輪廓讓透明瓶身發光，右側輕微補光讓液體顏色可見，液體呈現琥珀色透光感\n細節：玫瑰花瓣自然散落，輕微反光在木質台座上\n構圖：正面英雄鏡頭，略微仰角，瓶身佔畫面三分之二\n技術：85mm f/2.5，棚拍，4K\n負向詞：過亮、失去透明感、廉價塑膠感、花瓣太多太亂",
+      fullEn:"Subject: Crystal clear perfume bottle centered on dark wooden base, delicate metal cap\nColors: Dark wood base, amber gold liquid, rose pink accents\nLighting: Rim light from left rear as key light, illuminating bottle silhouette and making transparent glass glow, gentle right fill showing liquid color, amber liquid glowing translucent\nDetail: Rose petals naturally scattered, subtle reflections on wooden base\nComposition: Front hero shot, slight low angle, bottle filling 2/3 of frame\nTechnical: 85mm f/2.5, studio, 4K\nNegative: overexposed, losing transparency, cheap plastic feel, too many petals",
+      layers:[
+        {label:"① 主體描述",color:"#C9874A",keyZh:"晶瑩剔透香水瓶，深色木質台座，精緻金屬瓶蓋",keyEn:"Crystal clear perfume bottle on dark wooden base, delicate metal cap",teach:"透明玻璃瓶的描述要強調「透明感」——crystal clear（晶瑩剔透）讓 AI 知道這不是不透明的瓶子，而是可以透光、有折射感的玻璃材質。",joyce:"透明瓶要強調 crystal clear！這讓 AI 知道要生成透光、有折射的玻璃感，而不是不透明的塑膠瓶。"},
+        {label:"② 道具氛圍",color:"#A8C9A0",keyZh:"玫瑰花瓣自然散落，輕微反光在木質台座上",keyEn:"Rose petals naturally scattered, subtle reflections on wooden base",teach:"香水場景的道具要「自然散落」而不是「整齊擺放」——naturally scattered（自然散落）讓 AI 知道花瓣是隨意的、有生活感的，不是刻意排列的。",joyce:"花瓣要自然散落，不要整齊排列！Naturally scattered 讓 AI 生成有生活感的花瓣，整齊排列的花瓣會讓整張圖看起來假假的。"},
+        {label:"③ 光線打法",color:"#7A9EC9",keyZh:"左後方逆光為主光，打亮瓶身輪廓讓玻璃發光，右側輕微補光讓液體顏色可見",keyEn:"Rim light from left rear as key light illuminating bottle silhouette, gentle right fill showing liquid color",teach:"透明瓶的打光要用「逆光輪廓光」——從後方射入的逆光（rim light from rear）讓玻璃瓶身發光、輪廓清晰；右側補光讓液體的琥珀色可見，兩者缺一不可。",joyce:"透明瓶要用逆光輪廓光！從後方射入的逆光讓玻璃瓶身發光，再加輕微補光讓液體顏色可見——這兩道光組合才能讓香水瓶看起來高貴通透。"},
+        {label:"④ 構圖視角",color:"#A07AC9",keyZh:"正面英雄鏡頭，略微仰角，瓶身佔畫面三分之二",keyEn:"Front hero shot, slight low angle, bottle filling 2/3 of frame",teach:"香水瓶適合正面英雄鏡頭（front hero shot）——香水瓶通常是對稱設計，正面展示最能體現設計感；略微仰角讓瓶身顯得更高挑有氣勢。",joyce:"香水瓶適合正面英雄鏡頭！香水瓶是對稱設計，正面展示最能體現設計感，略微仰角讓瓶身顯得更高挑優雅。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"85mm f/2.5，棚拍；負向詞：過亮、失去透明感、廉價塑膠感",keyEn:"85mm f/2.5, studio — Negative: overexposed, losing transparency, cheap plastic feel",teach:"香水瓶最危險的問題是「過曝失去透明感」——負向詞一定要加 losing transparency，防止 AI 把晶瑩的玻璃瓶生成成死白不透明的塑膠瓶。",joyce:"香水瓶負向詞一定加 losing transparency！AI 很容易把透明玻璃瓶過曝成死白的塑膠感，這個詞是護身符。"}
+      ]},
+    { title:"新鮮蔬果", badge:"食材攝影",
+      ratio:"1:1",
+      keyZh:"剖開的熱帶水果橫切面，鮮豔果肉色彩，水珠附著表面，白色大理石背景，正上方俯視平拍，自然散射光，高飽和清新色調",
+      keyEn:"Cross-section of tropical fruit, vivid flesh colors, water droplets on surface, white marble background, direct overhead flat lay, natural diffused light, high saturation fresh tones",
+      fullZh:"主體：剖開的熱帶水果橫切面（西瓜/芒果/火龍果），鮮豔果肉，水珠附著表面\n背景：白色大理石平台\n光線：正上方自然散射光，均勻無陰影，讓色彩最大化顯現\n構圖：正上方俯視平拍（flat lay），水果置中，葉片裝飾旁搭\n色彩：高飽和清新色調，水果色彩鮮豔飽和，背景純白\n技術：50mm overhead shot f/8，自然光，高清細節\n負向詞：暗沉、不新鮮感、人工感、過暗陰影",
+      fullEn:"Subject: Cross-section of tropical fruit (watermelon/mango/dragon fruit), vivid flesh, water droplets on surface\nBackground: White marble flat surface\nLighting: Direct overhead natural diffused light, even with no shadows, maximizing color vibrancy\nComposition: Direct overhead flat lay, fruit centered, leaf garnish beside\nColors: High saturation fresh tones, vivid saturated fruit colors, pure white background\nTechnical: 50mm overhead shot f/8, natural light, high clarity details\nNegative: dull, unappetizing, artificial, dark shadows",
+      layers:[
+        {label:"① 主體描述",color:"#C9874A",keyZh:"剖開的熱帶水果橫切面，鮮豔果肉，水珠附著表面",keyEn:"Cross-section of tropical fruit, vivid flesh colors, water droplets on surface",teach:"食材攝影要強調「新鮮感細節」——water droplets on surface（水珠附著表面）是讓食材看起來「剛洗好、新鮮欲滴」的關鍵細節，比直接說「新鮮水果」更有效。",joyce:"食材要強調新鮮感細節！Water droplets on surface（水珠附著表面）讓食材看起來剛洗好、新鮮欲滴，比說「新鮮水果」有效一百倍。"},
+        {label:"② 背景道具",color:"#A8C9A0",keyZh:"白色大理石平台，葉片裝飾旁搭",keyEn:"White marble flat surface, leaf garnish beside",teach:"食材攝影的背景要「簡潔映襯」——白色大理石（white marble）是食材攝影的萬用背景，它的自然紋路不搶戲，又能讓食材的顏色更突出。",joyce:"白色大理石是食材攝影的萬用背景！自然紋路不搶戲，又能讓食材的顏色更突出，幾乎任何食材放上去都好看。"},
+        {label:"③ 光線打法",color:"#7A9EC9",keyZh:"正上方自然散射光，均勻無陰影，讓色彩最大化顯現",keyEn:"Direct overhead natural diffused light, even with no shadows, maximizing color vibrancy",teach:"食材平拍（flat lay）要用「正上方均勻散射光」——overhead diffused light（正上方散射光）讓整個食材被均勻照亮，沒有陰影干擾，讓鮮豔色彩完整呈現，這跟商品的有方向光完全相反。",joyce:"食材平拍要用正上方均勻散射光！讓食材被均勻照亮、沒有陰影，鮮豔色彩完整呈現——這跟商品有方向的光完全不同的邏輯。"},
+        {label:"④ 構圖視角",color:"#A07AC9",keyZh:"正上方俯視平拍（flat lay），水果置中，葉片裝飾旁搭",keyEn:"Direct overhead flat lay, fruit centered, leaf garnish beside",teach:"食材最適合俯視平拍（flat lay）——從正上方俯視讓橫切面完整展示，觀者可以看到所有細節；葉片旁搭增加自然感，但不能搶主角。",joyce:"食材橫切面要用 flat lay 俯視！從正上方才能讓橫切面完整展示，觀者看到所有美麗細節——這是食材攝影最重要的構圖選擇。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"50mm overhead shot f/8，自然光；負向詞：暗沉、不新鮮感、人工感",keyEn:"50mm overhead shot f/8, natural light — Negative: dull, unappetizing, artificial",teach:"食材攝影用 f/8（大景深）讓整個食材都清晰——不像人像用大光圈，食材要讓所有細節都銳利可見，特別是俯視平拍時所有元素都要清楚。",joyce:"食材攝影用 f/8 大景深！讓整個食材都清晰可見，不像人像用大光圈，食材要讓所有細節都銳利，特別是俯視平拍時更重要。"}
+      ]},
+    { title:"工業設計產品", badge:"科技攝影",
+      ratio:"16:9",
+      keyZh:"俐落無線耳機，消光黑金屬展示台，冷藍白輪廓光從側後方打亮產品邊緣，正前方輕微補光，深黑無縫背景，極簡科技美學",
+      keyEn:"Sleek wireless headphones on matte black metal stand, cool blue-white rim light from side-rear highlighting product edges, gentle front fill, seamless black background, minimal tech aesthetic",
+      fullZh:"主體：俐落無線耳機，置中於消光黑金屬展示台，不含品牌字樣\n色彩：深炭色、消光黑、冷藍銀——科技前衛色調\n背景：深黑無縫背景，輕微環境光暈\n光線：冷藍白輪廓光從側後方打亮產品邊緣，正前方輕微補光讓正面細節可見，整體偏冷色調\n構圖：正面英雄鏡頭，產品清晰銳利，深背景虛化\n技術：Sony A7R V 50mm f/2.8，棚拍，4K\n負向詞：暖色調、廉價感、雜亂背景、補光太強",
+      fullEn:"Subject: Sleek wireless headphones centered on matte black metal stand, no brand text\nColors: Deep charcoal, matte black, cool blue silver — tech-forward tones\nBackground: Deep black seamless background, subtle ambient glow\nLighting: Cool blue-white rim light from side-rear highlighting product edges, gentle front fill showing front detail, overall cool color temperature\nComposition: Front hero shot, product sharp, dark background fade\nTechnical: Sony A7R V 50mm f/2.8, studio, 4K\nNegative: warm tones, cheap feel, cluttered background, too much fill",
+      layers:[
+        {label:"① 主體描述",color:"#C9874A",keyZh:"俐落無線耳機，消光黑金屬展示台，不含品牌字樣",keyEn:"Sleek wireless headphones on matte black metal stand, no brand text",teach:"科技產品要強調「材質質地」——matte black（消光黑）、sleek（俐落）讓 AI 知道這是高端科技感，不是廉價塑膠。消光（matte）vs 亮面（glossy）是截然不同的質感。",joyce:"科技產品要強調材質質地！Matte black（消光黑）比 black 更精確，讓 AI 知道這是無反光的消光面，不是亮面塑膠。"},
+        {label:"② 色彩氛圍",color:"#A8C9A0",keyZh:"深炭色、消光黑、冷藍銀——科技前衛色調",keyEn:"Deep charcoal, matte black, cool blue silver — tech-forward tones",teach:"科技產品的配色走冷調——cool blue（冷藍）+ charcoal（炭色）是消費電子廣告的標準配方，換成暖色就失去科技感。",joyce:"科技類走冷調！Cool blue + charcoal 是消費電子廣告的標準配方，換成暖色就垮掉了。"},
+        {label:"③ 光線打法",color:"#7A9EC9",keyZh:"冷藍白輪廓光從側後方打亮產品邊緣，正前方輕微補光讓正面細節可見",keyEn:"Cool blue-white rim light from side-rear highlighting product edges, gentle front fill showing front detail",teach:"科技產品要用「側後方輪廓光」——rim light from side-rear（從側後方射入的輪廓光）沿著產品邊緣勾勒出俐落的光線，是科技廣告最標誌性的打光手法；正前方輕微補光讓正面的按鍵、紋路等細節可見。",joyce:"科技廣告必用側後方輪廓光！從側後方射入的冷藍輪廓光沿著產品邊緣勾勒出俐落線條，這是科技廣告最標誌性的打光——再加輕微前方補光讓正面細節可見。"},
+        {label:"④ 構圖視角",color:"#A07AC9",keyZh:"正面英雄鏡頭，產品清晰銳利，深背景虛化",keyEn:"Front hero shot, product sharp, dark background fade",teach:"科技產品常用正面或微斜角，強調設計細節和對稱感——正面展示讓觀者看到產品的設計語言；深色背景搭配亮色輪廓光是科技廣告最出效果的組合。",joyce:"科技產品適合正面英雄鏡頭！正面展示讓觀者看到設計語言，深色背景配亮色輪廓光是科技廣告最出效果的組合。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"Sony A7R V 50mm f/2.8，棚拍；負向詞：暖色調、廉價感、補光太強",keyEn:"Sony A7R V 50mm f/2.8, studio — Negative: warm tones, cheap feel, too much fill light",teach:"科技產品負向詞要加 warm tones（暖色調）——暖色調會讓科技感消失；too much fill（補光太強）會讓輪廓光失去效果，讓產品看起來平淡無奇。",joyce:"科技產品負向詞一定加 warm tones 和 too much fill！暖色調讓科技感消失，補光太強讓輪廓光失效，整個科技感就垮掉了。"}
+      ]}
+  ]
+};
+
+// ═══ 人物肖像 × 6 範例 ═══
+const CAT_PORTRAIT = {
+  id:"portrait", color:"#4A8FC9", bg:"#EEF4FC", border:"rgba(74,143,201,.2)",
+  name:"人物肖像", nameEn:"Portrait & Personal Brand",
+  tagline:"人物設定 × 光線 × 氣質情緒",
+  ratios:["4:5","1:1","9:16"],
+  icon:`<svg width="44" height="44" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="17" r="8" stroke="white" stroke-width="1.5"/><path d="M8 40C8 32 14 26 24 26C34 26 40 32 40 40" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="6" y1="17" x2="2" y2="11" stroke="white" stroke-width="1.2" stroke-linecap="round"/><circle cx="2" cy="10" r="3" stroke="white" stroke-width="1.2"/><line x1="42" y1="17" x2="46" y2="11" stroke="white" stroke-width="1.2" stroke-linecap="round"/><circle cx="46" cy="10" r="3" stroke="white" stroke-width="1.2"/></svg>`,
+  variants:[
+    { title:"個人品牌形象", badge:"LinkedIn形象",
+      ratio:"4:5",
+      keyZh:"自信亞洲女性三十多歲，溫暖自然微笑，中長微捲棕髮，白色合身西裝，左側柔和窗光為主光，右側反光板輕補，一側臉有細膩的亮暗交界，柔焦辦公室背景",
+      keyEn:"Confident Asian woman 30s, warm natural smile, wavy brown hair, white blazer, soft window light from left as key, gentle reflector fill from right, subtle light-shadow transition on one cheek, soft office background",
+      fullZh:"人物：自信亞洲女性三十多歲，溫暖自然微笑，自然妝容，中長微捲棕髮，白色合身西裝，珍珠耳環，直視鏡頭\n背景：柔焦現代辦公室或極簡攝影棚，乾淨無雜物，高端質感\n光線：左側柔和窗光（或大型柔光箱）為主光，右側反光板輕微補光，人臉一側有細膩的亮暗交界（非強烈對比），溫暖自然色溫\n構圖：上半身人像，平視鏡頭，三分構圖，頭部微傾\n氣質：值得信賴、專業又溫暖，個人品牌領袖氣場\n技術：Sony A7R V 85mm f/1.4，自然淺景深，保留真實膚質\n負向詞：強硬陰影、過度修圖、螢光燈色調、不自然膚色",
+      fullEn:"Subject: Confident Asian woman 30s, warm natural smile, natural makeup, medium wavy brown hair, fitted white blazer, pearl earrings, looking at camera\nBackground: Soft blurred modern office or minimalist studio, clean, uncluttered, premium\nLighting: Soft window light (or large softbox) from left as key light, gentle reflector fill from right, subtle light-shadow transition on one side of face (not harsh contrast), warm natural color temperature\nComposition: Upper body portrait, eye-level, rule of thirds, slight head tilt\nMood: Trustworthy, professional yet warm, personal brand leader energy\nTechnical: Sony A7R V 85mm f/1.4, natural shallow depth of field, preserve real skin texture\nNegative: harsh shadows, over-retouched, fluorescent color cast, unnatural skin",
+      layers:[
+        {label:"① 人物設定",color:"#4A8FC9",keyZh:"自信亞洲女性三十多歲，溫暖自然微笑，中長微捲棕髮，白色合身西裝",keyEn:"Confident Asian woman 30s, warm natural smile, medium wavy brown hair, fitted white blazer",teach:"人物描述要給五個維度：年齡感、表情、妝容程度、髮型、穿著。每一個都在幫 AI 塑造這個人是誰。",joyce:"人物描述要給五個維度！年齡感、表情、妝容、髮型、穿著，缺一個 AI 就會亂猜，生出怪怪的泛型臉孔。"},
+        {label:"② 背景設定",color:"#A8C9A0",keyZh:"柔焦現代辦公室或極簡攝影棚，乾淨無雜物，高端質感",keyEn:"Soft blurred modern office or minimalist studio, clean, uncluttered, premium",teach:"人像背景要做兩件事：說在哪裡和說什麼感覺。加 blurred 讓 AI 自動淺景深，不搶人物。",joyce:"人像背景要說「在哪裡」又要說「什麼感覺」！加上 blurred 讓 AI 自動淺景深，背景就不搶鏡了。"},
+        {label:"③ 光線打法",color:"#7A9EC9",keyZh:"左側柔和窗光為主光，右側反光板輕補，臉部一側有細膩亮暗交界，溫暖色溫",keyEn:"Soft window light from left as key, gentle reflector fill from right, subtle light-shadow transition on one cheek, warm color temperature",teach:"比「倫布蘭特打光」更有效的是「描述光的來源和性質」——soft window light from left（左側柔和窗光）告訴 AI 光的方向和質感；subtle light-shadow transition（細膩亮暗交界）告訴 AI 要有立體感但不要強烈對比，這比點名燈光流派更穩定。",joyce:"描述光的來源比點名燈光流派更有效！「左側柔和窗光」＋「臉部一側有細膩亮暗交界」，AI 按照這個生成比說「倫布蘭特光」更穩定，因為 AI 對描述性語言的理解比術語更準確。"},
+        {label:"④ 構圖氣質",color:"#A07AC9",keyZh:"上半身平視鏡頭，三分構圖，頭部微傾顯親和力",keyEn:"Upper body portrait, eye-level, rule of thirds, slight head tilt for approachability",teach:"Head tilt（頭部微傾）讓人物從商業感變成親切感。Mood 詞組直接影響人物的眼神和表情氛圍。",joyce:"頭部微傾（head tilt）是個小技巧，讓人物從「商業感」變成「親切感」，就這一個詞的差別！"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"Sony A7R V 85mm f/1.4，自然淺景深，保留真實膚質；負向詞：過度修圖、螢光燈色調",keyEn:"Sony A7R V 85mm f/1.4, natural shallow depth of field, preserve real skin texture — Negative: over-retouched, fluorescent color cast",teach:"人像最重要：85mm（不變形）+ f/1.4（背景虛化）+ preserve real skin texture（保留真實膚質）——這比 natural skin texture preserved 更強調「不要磨皮」。",joyce:"一定要加 preserve real skin texture！比 natural skin texture 更強調保留真實膚質，AI 就不會把皮膚磨得像蠟像了。"}
+      ]},
+    { title:"創業家形象", badge:"品牌人像",
+      ratio:"4:5",
+      keyZh:"自信男性三十多歲，輕鬆自信微笑，深色合身西裝，落地窗旁自然光從右側水平照入，臉部受光均勻，城市天際線虛化背景",
+      keyEn:"Confident male entrepreneur 30s, relaxed confident smile, dark fitted suit, natural light entering horizontally from right beside floor window, even facial lighting, blurred city skyline background",
+      fullZh:"人物：自信男性企業家三十多歲，輕鬆自信微笑，深色合身西裝，直視鏡頭\n背景：現代玻璃辦公室落地窗旁，城市天際線虛化背景\n光線：落地窗旁自然光從右側水平照入，光質柔和均勻，臉部受光面積大，陰影輕淡，整體明亮自然\n構圖：上半身，平視，略偏三分構圖，自信放鬆姿態\n氣質：專業、可信賴、現代企業家氣場\n技術：Canon R5 85mm f/2，4K\n負向詞：過於正式、僵硬感、強烈陰影、螢光燈色調",
+      fullEn:"Subject: Confident male entrepreneur 30s, relaxed confident smile, dark fitted suit, looking at camera\nBackground: Modern glass office by floor-to-ceiling window, blurred city skyline\nLighting: Natural light entering horizontally from right beside floor-to-ceiling window, soft even light quality, large lit area on face, light shadows, overall bright and natural\nComposition: Upper body, eye-level, slight rule of thirds, confident relaxed posture\nMood: Professional, trustworthy, modern entrepreneur energy\nTechnical: Canon R5 85mm f/2, 4K\nNegative: overly formal, stiff, harsh shadows, fluorescent color cast",
+      layers:[
+        {label:"① 人物設定",color:"#4A8FC9",keyZh:"自信男性企業家三十多歲，輕鬆自信微笑，深色合身西裝",keyEn:"Confident male entrepreneur 30s, relaxed confident smile, dark fitted suit",teach:"男性商業人像描述重點：relaxed（放鬆）+ confident（自信）的組合讓表情不死板；fitted（合身）強調專業不老氣。",joyce:"男性人像重點是 relaxed + confident 的組合！太正式會顯得死板，加上 relaxed 讓表情自然，加上 confident 讓氣場出來。"},
+        {label:"② 背景敘事",color:"#A8C9A0",keyZh:"現代玻璃辦公室落地窗旁，城市天際線虛化背景",keyEn:"Modern glass office by floor-to-ceiling window, blurred city skyline",teach:"企業家形象要有「背景敘事」——城市天際線（city skyline）暗示了成就感和格局，即使是虛化的也有這個效果。",joyce:"企業家形象要有背景敘事！城市天際線即使虛化，也在無聲地說「這個人有格局」——這就是視覺語言的力量。"},
+        {label:"③ 光線打法",color:"#7A9EC9",keyZh:"落地窗旁自然光從右側水平照入，光質柔和均勻，臉部受光面積大，陰影輕淡",keyEn:"Natural light entering horizontally from right beside floor window, soft even quality, large lit facial area, light shadows",teach:"男性商業人像的光要「大面積、均勻、自然」——natural light entering horizontally（水平射入的自然光）讓臉部受光均勻；large lit area on face（臉部受光面積大）讓整個人看起來明亮、有活力、沒有神秘感，適合建立信任感。",joyce:"男性商業人像要大面積均勻的自然光！水平射入的窗光讓臉部受光均勻，整個人看起來明亮有活力，建立信任感——這跟女性人像的強調立體光完全不同的策略。"},
+        {label:"④ 構圖氣質",color:"#A07AC9",keyZh:"上半身平視，略偏三分構圖，自信放鬆姿態",keyEn:"Upper body, eye-level, slight rule of thirds, confident relaxed posture",teach:"男性人像姿態提示詞：confident relaxed posture（自信放鬆的姿態）讓整個人站姿不僵硬，比描述具體動作更有效。",joyce:"Confident relaxed posture 這個詞組記下來！讓 AI 生成自信但不僵硬的站姿，比描述具體動作更有效。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"Canon R5 85mm f/2；負向詞：過於正式、僵硬、強烈陰影",keyEn:"Canon R5 85mm f/2 — Negative: overly formal, stiff, harsh shadows",teach:"男性人像負向詞重點：stiff（僵硬）+ harsh shadows（強烈陰影）是最常見的問題，一定要加進負向詞。",joyce:"男性人像負向詞一定加 stiff 和 harsh shadows！AI 最容易把男性拍得像蠟像、打光太強烈，這兩個詞是護身符。"}
+      ]},
+    { title:"創意總監形象", badge:"創意人像",
+      ratio:"4:5",
+      keyZh:"俐落亞洲女性三十五歲，藝術總監氣場，暗色系合身西裝，單一側光從左側水平硬打，右側全暗無補光，高對比明暗，工作室深色背景",
+      keyEn:"Stylish Asian female mid-30s, creative director aura, bold dark suit, single hard side light from left horizontal, right side completely unlit no fill, high contrast, dark studio background",
+      fullZh:"人物：俐落亞洲女性三十五歲，藝術總監氣場，暗色系合身西裝，強烈眼神，微微側臉\n背景：工作室深色背景，中性炭色\n光線：單一側光從左側水平硬打（無柔光罩），右側完全不補光，強烈明暗對比，臉部左側亮、右側暗，戲劇性光線\n構圖：上半身，略微俯角，強烈的視線與姿態\n氣質：自信、前衛、強烈個人風格\n技術：Leica Q 35mm，低飽和調色\n負向詞：均勻補光、柔和甜美風、過度修圖",
+      fullEn:"Subject: Stylish Asian female mid-35, creative director aura, bold dark fitted suit, intense gaze, slight profile angle\nBackground: Dark studio background, neutral charcoal\nLighting: Single hard side light from left horizontal (no softbox), right side completely unlit with no fill, strong contrast, left side of face lit right side dark, dramatic lighting\nComposition: Upper body, slight high angle, strong gaze and posture\nMood: Confident, avant-garde, strong personal style\nTechnical: Leica Q 35mm, low-saturation grade\nNegative: even fill light, soft sweet style, over-retouched",
+      layers:[
+        {label:"① 人物設定",color:"#4A8FC9",keyZh:"俐落亞洲女性三十五歲，藝術總監氣場，暗色系合身西裝，強烈眼神",keyEn:"Stylish Asian female mid-35, creative director aura, bold dark suit, intense gaze",teach:"創意人像要強調「氣場詞」——creative director aura（藝術總監氣場）、intense gaze（強烈眼神）直接定義整個人物的能量頻率。",joyce:"創意人像要用「氣場詞」！Creative director aura + intense gaze 直接定義人物能量，比描述外型細節更影響最終結果。"},
+        {label:"② 背景設定",color:"#A8C9A0",keyZh:"工作室深色背景，中性炭色",keyEn:"Dark studio background, neutral charcoal",teach:"創意人像背景要選「行業感」強的空間——深色炭色背景（dark charcoal）讓人物的能量更突出，不分散注意力。",joyce:"創意人像的背景要深色！深色炭色背景讓人物的能量更突出，整體氣質更強烈有力。"},
+        {label:"③ 光線打法",color:"#7A9EC9",keyZh:"單一側光從左側水平硬打，無柔光罩，右側完全不補光，強烈明暗對比",keyEn:"Single hard side light from left horizontal, no softbox, right side completely unlit, strong contrast",teach:"創意人像要用「硬光、單一方向、不補光」——hard light（硬光，不加柔光罩）讓陰影邊緣清晰銳利，比柔光更有戲劇性；右側完全不補光（no fill）讓暗面徹底黑暗，強烈明暗對比讓整個人物更有力量感和個性。",joyce:"創意人像要用硬光不補光！Single hard side light（硬光單一側光）讓陰影銳利有戲劇感，右側完全不補光讓暗面徹底黑暗——這種強烈對比讓人物力量感爆發，比溫和的倫布蘭特打光更有個性。"},
+        {label:"④ 構圖氣質",color:"#A07AC9",keyZh:"上半身略微俯角，強烈的視線與姿態",keyEn:"Upper body, slight high angle, strong gaze and posture",teach:"創意人像構圖要有「力量感」——略微俯角讓攝影師稍微在上方，配上 intense gaze，產生奇特的張力感。",joyce:"創意人像用俯角有奇效！稍微往下看配上強烈眼神，會產生奇特的張力感，讓觀者既被壓迫又被吸引。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"Leica Q 35mm，低飽和調色；負向詞：均勻補光、柔和甜美",keyEn:"Leica Q 35mm, low-saturation — Negative: even fill light, soft sweet style",teach:"創意人像用 Leica Q + 35mm（廣一點帶更多空間感）+ 低飽和調色（去掉過於鮮豔的商業感），三個詞組合讓整個氣質完全到位。",joyce:"創意人像要換 Leica Q！它比 Sony 更有電影感，35mm 廣一點帶更多空間感，加上低飽和調色，整個氣質就出來了。"}
+      ]},
+    { title:"說書人風格", badge:"內容創作者",
+      ratio:"9:16",
+      keyZh:"活力亞洲男性二十多歲，親切投入的眼神，直視鏡頭微笑，休閒穿搭，正面柔和散射光均勻照亮臉部，背景散景城市咖啡廳，短影音封面感",
+      keyEn:"Energetic Asian male 20s, engaging direct gaze, smiling at camera, casual outfit, soft diffused front light evenly illuminating face, blurred urban café background, Reels cover feel",
+      fullZh:"人物：活力亞洲男性二十多歲，親切投入的眼神，直視鏡頭微笑，休閒有型的穿搭\n背景：城市咖啡廳或現代工作空間，自然散景\n光線：正面柔和散射光為主，均勻照亮臉部，無明顯陰影，自然親切，避免強側光\n構圖：上半身到中景，垂直構圖，人物略偏左，9:16 直幅\n氣質：親切、有能量、可信賴的內容創作者\n技術：iPhone Pro Cinema mode 或 Sony ZV-E10，35mm，4K 直幅\n負向詞：硬光陰影、商業廣告感、僵硬、距離感",
+      fullEn:"Subject: Energetic Asian male 20s, engaging warm gaze, smiling directly at camera, casual stylish outfit\nBackground: Urban café or modern workspace, natural bokeh\nLighting: Soft diffused front light as key, evenly illuminating face, no obvious shadows, natural and approachable, avoid strong side lighting\nComposition: Upper body to mid-shot, vertical framing, slightly left, 9:16 portrait\nMood: Approachable, energetic, trustworthy content creator\nTechnical: iPhone Pro Cinema mode or Sony ZV-E10, 35mm, 4K vertical\nNegative: harsh side shadows, commercial feel, stiff, distant",
+      layers:[
+        {label:"① 人物設定",color:"#4A8FC9",keyZh:"活力亞洲男性二十多歲，親切投入的眼神，直視鏡頭微笑，休閒有型穿搭",keyEn:"Energetic Asian male 20s, engaging warm gaze, smiling directly at camera, casual stylish outfit",teach:"內容創作者人像的描述要強調「親切感和能量」——engaging（投入的）和 warm gaze（溫暖眼神）讓 AI 知道這個人物要有互動感，跟觀眾有連結，不是商業廣告的疏離感。",joyce:"內容創作者人像要強調親切感！Engaging warm gaze + smiling directly at camera 讓 AI 知道這個人物要跟觀眾有連結，不是商業廣告的疏離感。"},
+        {label:"② 背景設定",color:"#A8C9A0",keyZh:"城市咖啡廳或現代工作空間，自然散景",keyEn:"Urban café or modern workspace, natural bokeh",teach:"內容創作者的背景要有「生活感」——urban café（都市咖啡廳）給人一種活在城市裡、隨時在創作的感覺；自然散景（natural bokeh）讓背景柔化不搶人。",joyce:"內容創作者的背景要有生活感！都市咖啡廳給人一種活在城市裡隨時在創作的感覺，自然散景讓背景柔化，主角更突出。"},
+        {label:"③ 光線打法",color:"#7A9EC9",keyZh:"正面柔和散射光均勻照亮臉部，無明顯陰影，自然親切",keyEn:"Soft diffused front light evenly illuminating face, no obvious shadows, natural and approachable",teach:"內容創作者要用「均勻正面光」——soft diffused front light（柔和散射前光）從正前方均勻照亮臉部，沒有陰影，讓人看起來最友善、最親切；這跟創意總監的強側光完全相反的策略，因為不同氣質需要不同打光邏輯。",joyce:"內容創作者要用均勻正面光！Soft diffused front light 讓臉部沒有陰影，看起來最友善親切——跟創意總監的強側光完全相反，因為不同的氣質需要不同的打光邏輯。"},
+        {label:"④ 構圖動線",color:"#A07AC9",keyZh:"上半身到中景，垂直構圖，人物略偏左，9:16 直幅",keyEn:"Upper body to mid-shot, vertical framing, slightly left, 9:16 portrait",teach:"短影音封面的構圖要「垂直、略偏」——人物略偏左留右側空間給文字標題；9:16 垂直格式讓畫面完整填滿手機螢幕，是短影音封面最重要的格式要求。",joyce:"短影音封面人物要略偏左！右側留空間給文字標題，9:16 垂直格式填滿手機螢幕——這是短影音封面最重要的兩個構圖要求。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"iPhone Pro Cinema mode，35mm；負向詞：硬光陰影、商業廣告感、距離感",keyEn:"iPhone Pro Cinema mode, 35mm — Negative: harsh shadows, commercial feel, distant",teach:"內容創作者用 iPhone Pro Cinema mode——這讓 AI 生成有手機拍攝質感的圖，不過度完美，有真實感；35mm 比 85mm 廣一點，帶更多環境感，讓人物融入場景中。",joyce:"內容創作者用 iPhone Pro Cinema mode！這讓 AI 生成有手機拍攝質感的圖，不過度完美，有真實感——35mm 廣一點帶更多環境感，讓人物融入生活場景中。"}
+      ]},
+    { title:"藝術家工作照", badge:"創意紀實",
+      ratio:"4:5",
+      keyZh:"藝術家在工作室創作，側身專注，自然光從側面窗口照入，工作室雜亂而有質感，顏料工具可見，紀實感抓拍風格，低飽和底片色調",
+      keyEn:"Artist creating in studio, side profile focused, natural light entering from side window, textured cluttered studio, paints and tools visible, documentary candid style, desaturated film tone",
+      fullZh:"人物：藝術家側身在工作室創作，專注投入，不看鏡頭\n場景：充滿質感的工作室，顏料工具畫作散落，有生活痕跡\n光線：自然光從側面窗口照入，明暗分明，光線在工作室內形成光束效果，人物一側受光一側在暗部\n構圖：中遠景，保留工作室環境，人物和環境同樣重要\n風格：紀實感抓拍，非擺拍，Magnum 攝影師風格\n技術：35mm f/2，低飽和底片色調，自然粗粒感\n負向詞：過度修飾、擺拍感、商業感、工作室太整潔",
+      fullEn:"Subject: Artist creating from side profile in studio, deeply focused, not looking at camera\nSetting: Textured studio environment, paints tools artworks scattered, signs of life and work\nLighting: Natural light from side window, clear light-shadow contrast, light rays visible in studio space, person lit on one side dark on other\nComposition: Medium-wide shot, studio environment as important as person, environmental portrait\nStyle: Documentary candid feel, not posed, Magnum photographer style\nTechnical: 35mm f/2, desaturated film tone, natural grain\nNegative: over-polished, posed, commercial feel, too-clean studio",
+      layers:[
+        {label:"① 人物狀態",color:"#4A8FC9",keyZh:"藝術家側身在工作室創作，專注投入，不看鏡頭",keyEn:"Artist creating from side profile in studio, deeply focused, not looking at camera",teach:"紀實人像的關鍵是「不看鏡頭」——not looking at camera（不看鏡頭）讓整個場景有偷拍的真實感，人物沉浸在自己的世界裡，觀者成為旁觀者，這種距離感反而更吸引人。",joyce:"紀實人像要「不看鏡頭」！Not looking at camera 讓場景有真實感，人物沉浸在自己的世界裡，觀者成為旁觀者——這種距離感反而更吸引人，更有故事性。"},
+        {label:"② 環境道具",color:"#A8C9A0",keyZh:"充滿質感的工作室，顏料工具畫作散落，有生活痕跡",keyEn:"Textured studio environment, paints tools artworks scattered, signs of life and work",teach:"環境人像要「讓環境說話」——signs of life and work（生活和工作的痕跡）讓整個工作室有故事感；scattered（散落）而不是整齊的工具讓場景更真實，不像拍攝前刻意整理過的。",joyce:"環境人像要讓環境說話！Signs of life and work（生活和工作的痕跡）讓工作室有故事感，散落的工具比整齊排列更真實，不像刻意整理過的拍攝場景。"},
+        {label:"③ 光線打法",color:"#7A9EC9",keyZh:"自然光從側面窗口照入，明暗分明，光束效果，人物一側受光一側在暗部",keyEn:"Natural light from side window, clear light-shadow contrast, light rays in studio, person lit one side dark other",teach:"紀實人像的光要「自然、有方向、不均勻」——natural light from side window（自然光從側面窗口）讓光線有真實感；光束效果（light rays）在工作室的塵埃中可見，增加氛圍感；人物一側受光一側暗部讓畫面更有戲劇張力。",joyce:"紀實人像要用側面窗口自然光！光束在工作室塵埃中可見，人物一側受光一側在暗部——這種自然、不均勻的光才有真實感，比棚拍的均勻光更有故事性。"},
+        {label:"④ 構圖框架",color:"#A07AC9",keyZh:"中遠景，保留工作室環境，人物和環境同樣重要",keyEn:"Medium-wide shot, studio environment as important as person, environmental portrait",teach:"環境人像要「退一步給環境空間」——medium-wide shot（中遠景）讓工作室的環境和人物同樣重要，不是只拍人；environmental portrait（環境人像）是一種攝影術語，強調人物和其生活環境的關係。",joyce:"環境人像要退一步！Medium-wide shot 讓工作室和人物同等重要，environmental portrait 這個術語讓 AI 知道要呈現人物和環境的關係，不只是拍人。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"35mm f/2，低飽和底片色調，自然粗粒感；負向詞：擺拍感、過度修飾",keyEn:"35mm f/2, desaturated film tone, natural grain — Negative: posed, over-polished",teach:"紀實人像的技術詞強調「真實感」——natural grain（自然粗粒感）和 film tone（底片色調）讓整張圖有真實的攝影質感；負向詞加 posed（擺拍感）和 over-polished（過度修飾）防止 AI 生成太完美的商業感。",joyce:"紀實人像技術詞要強調真實感！Natural grain + film tone 讓圖有真實攝影質感，負向詞加 posed 和 over-polished 防止 AI 生成太完美的商業感。"}
+      ]},
+    { title:"親子溫馨形象", badge:"家庭攝影",
+      ratio:"4:5",
+      keyZh:"亞洲媽媽和孩子戶外互動，黃金時刻溫暖側光從左後方照入，形成溫柔光暈，人物在光線中笑鬧，自然草地背景，底片暖調",
+      keyEn:"Asian mother and child interacting outdoors, warm golden hour side-back light from left rear creating soft halo, people laughing in warm light, natural grass background, warm film tone",
+      fullZh:"人物：亞洲媽媽和孩子（3-6歲），戶外互動、玩耍、笑鬧\n場景：公園草地或花園，自然環境\n光線：黃金時刻溫暖側逆光從左後方照入，在頭部和肩膀形成溫柔光暈（halo），正面有自然環境反射補光，整體溫暖金色\n構圖：中景，媽媽和孩子都在畫面中，互動動作中\n氣質：溫暖、幸福、純真，非擺拍自然感\n技術：85mm f/1.8，底片暖調，淡化綠色飽和，提升膚色暖度\n負向詞：冷色調、擺拍感、過度修圖、商業廣告感",
+      fullEn:"Subject: Asian mother and child (3-6 years old) outdoors, interacting playing laughing\nSetting: Park grass or garden, natural environment\nLighting: Warm golden hour side-back light from left rear, creating soft halo around heads and shoulders, natural environmental bounce fill from front, overall warm golden\nComposition: Mid-shot, both mother and child in frame, mid-interaction action\nMood: Warm, joyful, innocent, candid not posed\nTechnical: 85mm f/1.8, warm film grade, slightly desaturated greens, enhanced warm skin tones\nNegative: cold tones, posed, over-retouched, commercial feel",
+      layers:[
+        {label:"① 人物互動",color:"#4A8FC9",keyZh:"亞洲媽媽和孩子戶外互動、玩耍、笑鬧",keyEn:"Asian mother and child outdoors, interacting playing laughing",teach:"家庭人像要強調「互動動作」——interacting playing laughing（互動、玩耍、笑鬧）讓 AI 知道這不是人物站著擺拍，而是在動態互動中，整個場景有生命感和故事感。",joyce:"家庭人像要強調互動動作！Interacting playing laughing 讓 AI 知道這不是擺拍，而是在動態互動中——有互動感的家庭照比站著擺拍的家庭照溫暖一百倍。"},
+        {label:"② 場景氛圍",color:"#A8C9A0",keyZh:"公園草地或花園，自然環境",keyEn:"Park grass or garden, natural environment",teach:"家庭人像的場景要「自然、開闊」——公園草地（park grass）給家庭人像提供了充足的自然光和柔和的綠色背景，比室內拍攝更有戶外的生命力感。",joyce:"家庭人像要選自然開闊的場景！公園草地提供充足的自然光和柔和綠色背景，比室內拍攝更有生命力感。"},
+        {label:"③ 光線打法",color:"#7A9EC9",keyZh:"黃金時刻溫暖側逆光從左後方照入，在頭部肩膀形成溫柔光暈，正面自然環境反射補光",keyEn:"Warm golden hour side-back light from left rear, soft halo around heads and shoulders, natural environmental bounce fill from front",teach:"家庭人像的完美光線是「黃金時刻側逆光」——warm golden hour side-back light（黃金時刻側逆光）讓人物在光暈中，頭部和肩膀形成光圈（halo），溫暖神聖；正面有自然環境的反射光補光，讓臉部不會過暗，這是最能讓家庭照有「溫暖幸福感」的打光法。",joyce:"家庭人像要用黃金時刻側逆光！人物在光暈中，頭部肩膀形成溫柔光圈，正面有環境反射光補光——這是最能讓家庭照充滿「溫暖幸福感」的打光法，一學就會用一輩子。"},
+        {label:"④ 構圖情感",color:"#A07AC9",keyZh:"中景，媽媽和孩子都在畫面中，互動動作中",keyEn:"Mid-shot, both in frame, mid-interaction action",teach:"家庭人像構圖要「留住互動動作的瞬間」——mid-interaction action（互動動作中）讓 AI 知道要抓住那個動態的瞬間，不是靜止的擺拍；兩人都在畫面中讓關係感更完整。",joyce:"家庭人像要抓互動動作的瞬間！Mid-interaction action 讓 AI 抓住那個動態的一刻，比靜止擺拍溫暖有故事感一百倍。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"85mm f/1.8，底片暖調，淡化綠色飽和，提升膚色暖度；負向詞：冷色調、擺拍感",keyEn:"85mm f/1.8, warm film grade, slightly desaturated greens, enhanced warm skin tones — Negative: cold tones, posed",teach:"家庭人像的調色秘訣：淡化綠色飽和（desaturated greens）讓草地不過度鮮豔搶戲；提升膚色暖度（enhanced warm skin tones）讓人物的膚色更有溫度感，整個畫面更溫暖治癒。",joyce:"家庭人像調色秘訣：淡化綠色飽和讓草地不搶戲，提升膚色暖度讓整個畫面更溫暖治癒——這兩個調色詞組合讓家庭照從「普通紀念照」變成「有溫度的藝術照」。"}
+      ]}
+  ]
+};
+
+// ═══ 空間場景（從舊版繼承，每類3個範例）===
+const CAT_SCENE = {
+  id:"scene", color:"#3A9E88", bg:"#EEF8F5", border:"rgba(58,158,136,.2)",
+  name:"空間場景", nameEn:"Space & Atmosphere",
+  tagline:"環境敘事 × 氛圍光線 × 生活細節，讓空間說故事",
+  ratio:"16:9", platforms:["GPT Image 2","Nano Banana Pro"],
+  icon:`<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="8" width="40" height="28" rx="2" stroke="white" stroke-width="1.5"/><line x1="4" y1="36" x2="44" y2="36" stroke="white" stroke-width="1.2"/><line x1="10" y1="8" x2="10" y2="36" stroke="white" stroke-width="0.8" stroke-dasharray="2,4"/><line x1="38" y1="8" x2="38" y2="36" stroke="white" stroke-width="0.8" stroke-dasharray="2,4"/><polygon points="24,8 44,36 4,36" fill="white" fill-opacity="0.08" stroke="white" stroke-width="1"/><rect x="16" y="26" width="8" height="10" rx="1" stroke="white" stroke-width="1.2"/><rect x="28" y="28" width="10" height="8" rx="1" stroke="white" stroke-width="1.2"/><circle cx="24" cy="18" r="4" stroke="white" stroke-width="1.2"/><line x1="16" y1="42" x2="32" y2="42" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  ratios:["16:9","4:5","1:1"],
+  variants:[
+    { title:"日系咖啡廳", badge:"空間攝影",
+      keyZh:"高挑天花板現代咖啡廳，落地弧形窗，午後陽光傾瀉，裸露混凝土牆，室內植栽，原木家具，手沖咖啡蒸氣升起，東京遇見哥本哈根",
+      keyEn:"High-ceiling modern café, arched windows, afternoon sunlight streaming, exposed concrete, indoor plants, wood furniture, steam rising, Tokyo meets Copenhagen",
+      fullZh:"空間：高挑天花板現代咖啡廳，落地弧形窗，溫暖午後陽光傾瀉，裸露混凝土牆，豐盛室內植栽，原木家具帶溫潤包漿\n細節：大理石吧台，手沖咖啡蒸氣升起，桌上散落翻開的書和 MacBook\n光線：午後金色陽光透窗湧入，地面和牆上戲劇性光影，暖琥珀色溫 3000K\n氣質：靜謐、沉思、知性，「週三早晨什麼都不緊急」的能量，東京遇見哥本哈根\n構圖：廣角建立鏡頭，前景細節元素，透視線引向窗戶\n技術：Canon EOS R5，24mm f/8，純自然光，底片質感顆粒，低彩度調色\n負向詞：強烈陰影、無菌感、太亮、空間凌亂、商務飯店感\n比例：16:9",
+      fullEn:"Space: High-ceiling modern café, floor-to-ceiling arched windows, warm afternoon sunlight, exposed concrete walls, lush indoor plants, natural wood furniture\nDetails: Marble countertop, steam rising from pour-over, scattered open books and MacBook\nLighting: Golden afternoon light flooding through windows, dramatic shadow patterns, warm amber 3000K\nAtmosphere: Quiet, contemplative, intellectual, \"Wednesday morning where nothing is urgent\", Tokyo meets Copenhagen\nComposition: Wide establishing shot, foreground detail element, perspective lines to windows\nTechnical: Canon EOS R5, 24mm f/8, natural light only, subtle film grain, muted color grading\nNegative: harsh shadows, sterile, too bright, cluttered, commercial hotel look\nRatio: 16:9",
+      layers:[
+        {label:"① 空間架構",color:"#3A9E88",keyZh:"高挑天花板現代咖啡廳，落地弧形窗，裸露混凝土牆，豐盛室內植栽，原木家具",keyEn:"High-ceiling café, floor-to-ceiling arched windows, exposed concrete walls, lush indoor plants, natural wood furniture",teach:"空間描述要給「建築骨架」+「材質質感」+「植物道具」三層。Arched windows（弧形窗）比大窗更有設計感；exposed concrete + natural wood 是溫暖工業風標配。",joyce:"空間提示詞要給三層！建築骨架、材質質感、植物道具。Exposed concrete + natural wood 是現在最流行的溫暖工業風標配！"},
+        {label:"② 生活細節",color:"#A8C9A0",keyZh:"手沖咖啡蒸氣升起，散落翻開的書本，大理石吧台——有人住過的感覺",keyEn:"Steam rising from pour-over, scattered open books, marble countertop — signs that someone lives here",teach:"道具細節讓空間「有人住過」的感覺。Steam rising（蒸氣升起）、scattered books（散落書本）讓 AI 生成有生活感的空間。",joyce:"道具細節讓空間有靈魂！Steam rising、scattered books——這些使用中的痕跡，讓 AI 生成有生活感的空間，而不是無菌展示間。"},
+        {label:"③ 光線氛圍",color:"#7A9EC9",keyZh:"午後金色陽光透窗湧入，戲劇性地面光影，暖琥珀色溫 3000K，角落蠟燭帶環境暖意",keyEn:"Golden afternoon light flooding through windows, dramatic shadow patterns on floor, warm amber 3000K, candles in corner",teach:"室內攝影的光是整張圖的生命。直接給色溫（3000K）讓 AI 知道要暖調；dramatic light and shadow patterns 製造高對比光影。",joyce:"直接給色溫（3000K）讓 AI 知道要多暖！Dramatic light and shadow patterns 製造戲劇性光影——室內攝影沒有光影就沒有靈魂。"},
+        {label:"④ 空間氣質",color:"#A07AC9",keyZh:"靜謐、沉思、知性——「週三早晨什麼都不緊急」的能量，東京遇見哥本哈根",keyEn:"Quiet, contemplative, intellectual — \"Wednesday morning where nothing is urgent\" energy, Tokyo meets Copenhagen",teach:"空間氣質描述是差異所在！直接描述那種感覺、那個時刻，甚至造一個句子——AI 就知道整體基調。",joyce:"空間氣質描述是最大差異！描述那種感覺，造一個句子——AI 就知道整體基調。「東京遇見哥本哈根」比說北歐風精準十倍！"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"Canon EOS R5，24mm f/8，純自然光；負向詞：強烈陰影、商務飯店感、冷色光",keyEn:"Canon EOS R5, 24mm f/8, natural light only — Negative: harsh shadows, hotel look, cold lighting",teach:"空間攝影技術：24mm wide lens（廣角，讓空間更寬敞）+ f/8（全景深，讓整個空間清晰）+ natural light only。",joyce:"空間攝影用 24mm 廣角 + f/8！廣角讓空間更寬敞，f/8 讓整個場景清晰，natural light only 避免 AI 加上奇怪的人工燈光。"}
+      ]},
+    { title:"北歐極簡住宅", badge:"居家美學",
+      keyZh:"北歐極簡客廳，白色光滑牆面，原木家具，Arco 落地燈，大窗漫射自然光，莫蘭迪色調，侘寂美學",
+      keyEn:"Nordic minimalist living room, smooth white walls, natural wood, Arco floor lamp, large window diffused light, Morandi palette, wabi-sabi aesthetic",
+      fullZh:"空間：北歐極簡客廳，白色光滑牆面，淺色橡木地板，低矮家具輪廓，大幅灰白畫作\n家具：極簡設計沙發（亞麻米白），Arco 弧型落地燈，橡木咖啡桌，陶瓷花瓶\n植物：一株高挑的尤加利枝，小型多肉盆栽\n光線：大落地窗自然漫射光，均勻柔和，無強光，白色反光牆面\n氣質：寧靜、整潔、優雅克制，「有品味的空白」的能量\n色彩：莫蘭迪色系——米白、淺灰、霧霾藍、鼠尾草綠\n技術：24mm，f/8，漫射自然光，低對比低飽和調色\n負向詞：色彩太多、凌亂、商業 model room 感、太新太亮\n比例：16:9",
+      fullEn:"Space: Nordic minimalist living room, smooth white walls, light oak flooring, low-profile furniture, large grey-white artwork\nFurniture: Minimal design sofa (linen ivory), Arco arc floor lamp, oak coffee table, ceramic vase\nPlants: Tall eucalyptus branch, small succulent pot\nLighting: Large window diffused natural light, even and gentle, no harsh light, white reflective walls\nAtmosphere: Serene, organized, elegantly restrained, \"tasteful emptiness\" energy\nColors: Morandi palette — ivory, light grey, misty blue, sage green\nTechnical: 24mm, f/8, diffused natural light, low contrast low saturation\nNegative: too many colors, cluttered, commercial model room feel, too new too bright\nRatio: 16:9",
+      layers:[
+        {label:"① 空間架構",color:"#3A9E88",keyZh:"北歐極簡客廳，白色光滑牆面，淺色橡木地板，低矮家具輪廓，大幅灰白畫作",keyEn:"Nordic minimalist living room, smooth white walls, light oak flooring, low-profile furniture, large grey-white artwork",teach:"北歐極簡空間的描述重點是「少即是多」——low-profile furniture（低矮家具）、smooth white walls（光滑白牆）都在說這個空間選擇少而精的美學。",joyce:"北歐極簡的關鍵是描述「少即是多」！Low-profile furniture 加上 smooth white walls，整個空間的克制美感就出來了。"},
+        {label:"② 生活細節",color:"#A8C9A0",keyZh:"Arco 弧型落地燈，橡木咖啡桌，陶瓷花瓶，一株高挑的尤加利枝",keyEn:"Arco arc floor lamp, oak coffee table, ceramic vase, tall eucalyptus branch",teach:"北歐室內的道具要「有名字」——Arco（設計經典的弧形落地燈）讓 AI 知道要生成那個標誌性的弧形燈，不是一個普通的燈。",joyce:"道具要有名字！Arco floor lamp 是設計經典，AI 知道那個標誌性的弧形燈，直接指名比說「弧形燈」精準十倍。"},
+        {label:"③ 光線氛圍",color:"#7A9EC9",keyZh:"大落地窗自然漫射光，均勻柔和，無強光，白色反光牆面",keyEn:"Large window diffused natural light, even and gentle, no harsh light, white reflective walls",teach:"北歐極簡的光要「柔、均、白」——diffused（漫射）讓光均勻沒有強陰影；white reflective walls 讓整個空間充滿反射光。",joyce:"北歐的光要柔、均、白！Diffused 讓光均勻沒有強陰影，white reflective walls 讓整個空間充滿反射光，這就是北歐設計美學的光線語言。"},
+        {label:"④ 空間氣質",color:"#A07AC9",keyZh:"寧靜、整潔、優雅克制，「有品味的空白」的能量，Kinfolk 美學",keyEn:"Serene, organized, elegantly restrained, \"tasteful emptiness\" energy, Kinfolk aesthetic",teach:"「有品味的空白」（tasteful emptiness）——這個描述詞告訴 AI 這個空間的空白是刻意為之的，是美學選擇，不是沒有裝潢。",joyce:"「有品味的空白」這個詞超厲害！Tasteful emptiness 告訴 AI 這個空間的留白是刻意的美學選擇，不是沒裝潢——這一句話就能讓 AI 理解整個空間的設計態度。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"24mm，f/8，漫射自然光，低對比低飽和調色；負向詞：顏色太多、商業感",keyEn:"24mm, f/8, diffused natural light, low contrast low saturation — Negative: too many colors, model room feel",teach:"北歐室內攝影技術詞：低對比低飽和讓整個空間的色調更有質感，避免過於鮮豔的商業感。",joyce:"北歐空間要加 low contrast low saturation！讓整個色調更有質感，記得在負向詞加 model room feel，不然 AI 容易生成過度完美的樣品屋感。"}
+      ]},
+    { title:"侘寂茶室", badge:"和風空間",
+      keyZh:"日式侘寂茶室，竹木元素，低矮榻榻米，和紙燈籠，枯山水庭院一角，自然老化質感，冥想氛圍",
+      keyEn:"Japanese wabi-sabi tea room, bamboo wood elements, low tatami mat, washi paper lantern, dry landscape garden, aged natural textures, meditative atmosphere",
+      fullZh:"空間：日式侘寂茶室，竹木建築元素，低矮榻榻米席，和紙燈籠柔和光，推拉木格紋門\n細節：古樸陶瓷茶具，一枝枯枝，苔蘚石頭，枯山水庭院一角可見\n老化質感：斑駁的木材紋理，粗糙灰泥牆，磨損的石板地\n光線：清晨漫射自然光，和紙過濾的柔和燈光，幽暗寧靜，長長的光影\n氣質：冥想、侘寂美學、不完美的美，「一切都在緩慢消逝」的禪意\n技術：35mm，f/5.6，漫射自然光，底片調色，高度去飽和\n負向詞：現代感、太整潔、鮮豔色彩、商業日式餐廳感\n比例：16:9",
+      fullEn:"Space: Japanese wabi-sabi tea room, bamboo wood elements, low tatami mat, washi paper lantern, sliding wood lattice door\nDetails: Rustic ceramic tea set, single bare branch, moss and stones, dry landscape garden corner\nAged textures: Weathered wood grain, rough plaster walls, worn stone floor tiles\nLighting: Early morning diffused natural light, softened through washi paper, dim and serene, long soft shadows\nAtmosphere: Meditative, wabi-sabi aesthetic, imperfect beauty, \"everything slowly fading\" zen quality\nTechnical: 35mm, f/5.6, diffused natural light, film grade, highly desaturated\nNegative: modern feel, too clean, vivid colors, commercial Japanese restaurant feel\nRatio: 16:9",
+      layers:[
+        {label:"① 空間架構",color:"#3A9E88",keyZh:"日式侘寂茶室，竹木建築元素，低矮榻榻米席，和紙燈籠，推拉木格紋門",keyEn:"Japanese wabi-sabi tea room, bamboo wood elements, low tatami mat, washi paper lantern, sliding lattice door",teach:"和室空間描述要用「具體的日式元素名詞」——washi paper lantern（和紙燈籠）、tatami mat（榻榻米）讓 AI 生成有真實感的日式空間。",joyce:"和室空間要用具體的日式元素名詞！Washi paper lantern、tatami mat——這些具體名詞讓 AI 生成有真實感的日式空間，不是泛泛的亞洲風。"},
+        {label:"② 生活細節",color:"#A8C9A0",keyZh:"古樸陶瓷茶具，一枝枯枝，苔蘚石頭，枯山水庭院一角——不完美的美",keyEn:"Rustic ceramic tea set, single bare branch, moss and stones, dry landscape garden corner — imperfect beauty",teach:"侘寂美學的道具要「有老化感」——worn（磨損）、aged（老化）、rustic（古樸）這些形容詞讓空間有了時間感和哲學深度。",joyce:"侘寂的道具要有老化感！Worn、aged、rustic 讓空間有時間感和哲學深度——不完美才是最完美的美。"},
+        {label:"③ 光線氛圍",color:"#7A9EC9",keyZh:"清晨漫射自然光，和紙過濾的柔和燈光，幽暗寧靜，長長的光影",keyEn:"Early morning diffused natural light, softened through washi paper, dim and serene, long soft shadows",teach:"侘寂的光要「暗、柔、有方向」——dim and serene（幽暗寧靜）+ long soft shadows（長柔陰影）創造出禪意空間特有的光線感。",joyce:"侘寂的光要暗、柔、有方向！Dim and serene 加上 long soft shadows 創造禪意空間的光線感，讓時間好像靜止了。"},
+        {label:"④ 空間氣質",color:"#A07AC9",keyZh:"冥想、侘寂美學、不完美的美、「一切都在緩慢消逝」的禪意",keyEn:"Meditative, wabi-sabi aesthetic, imperfect beauty, \"everything slowly fading\" zen quality",teach:"侘寂最難用文字表達，但要試著給 AI 一個詩意的描述——「一切都在緩慢消逝」讓 AI 理解這個空間想傳達的哲學感。",joyce:"侘寂最難用文字表達，但這句話試試：everything slowly fading（一切都在緩慢消逝）！這個詩意描述讓 AI 理解侘寂的哲學感，往往能生成出讓人驚艷的結果。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"35mm f/5.6，漫射自然光，底片調色，高度去飽和；負向詞：現代感、鮮豔色彩",keyEn:"35mm, f/5.6, diffused natural light, film grade, highly desaturated — Negative: modern feel, vivid colors",teach:"侘寂空間技術詞：highly desaturated（高度去飽和）是最重要的——侘寂的色彩要「褪色」而不鮮豔；底片調色加高去飽和讓空間顯得有年歲感。",joyce:"侘寂空間最重要的技術詞是 highly desaturated！侘寂的色彩要褪色而不鮮豔，底片調色加高去飽和，讓整個空間顯得有年歲感，這正是侘寂美學的精髓。"}
+      ]}
+  ]
+};
+
+// ═══ 插畫風格 ═══
+const CAT_ILLUS = {
+  id:"illustration", color:"#8B52CC", bg:"#F5F0FC", border:"rgba(139,82,204,.2)",
+  name:"插畫風格", nameEn:"Illustration & Art Style",
+  tagline:"風格語言 × 媒材感 × 色彩系統，選對關鍵詞",
+  ratio:"1:1", platforms:["GPT Image 2","Nano Banana Pro"],
+  icon:`<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 38L18 20L26 30L32 22L40 38H10Z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><circle cx="34" cy="14" r="4" stroke="white" stroke-width="1.5"/><path d="M6 10C6 10 10 6 14 10" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M6 42H42" stroke="white" stroke-width="1.2" stroke-linecap="round"/><circle cx="10" cy="30" r="1.5" fill="white" fill-opacity="0.5"/></svg>`,
+  ratios:["1:1","4:5","16:9"],
+  variants:[
+    { title:"日系動漫人物", badge:"插畫生成",
+      keyZh:"日系動漫風格，少女人物，精緻細膩，白色水手服，清澈大眼睛，飄動長髮，春日校園背景，淡彩水彩感，niji journey 風格",
+      keyEn:"Japanese anime style, young girl character, delicate and refined, white sailor uniform, clear large eyes, flowing long hair, spring school background, soft watercolor feel, niji journey style",
+      fullZh:"風格：日系動漫插畫，精緻細膩畫風，Makoto Shinkai 電影光感\n人物：少女角色，清澈大眼睛帶光點，飄動長髮，白色水手服，自然開心的表情\n背景：春日校園，櫻花飄落，溫暖陽光透過葉片\n色彩：淡粉、淡藍、米白——清新柔和的動漫色調\n光線：從後方透入的溫暖陽光，逆光光暈效果\n技術：anime illustration, highly detailed, cel-shaded, soft lineart, pastel color palette\n負向詞：realistic, photorealistic, 3D render, ugly, deformed\n比例：1:1",
+      fullEn:"Style: Japanese anime illustration, delicate refined style, Makoto Shinkai cinematic lighting\nCharacter: Young girl, clear large eyes with light reflections, flowing long hair, white sailor uniform, natural happy expression\nBackground: Spring school campus, cherry blossoms falling, warm sunlight through leaves\nColors: Soft pink, light blue, ivory white — fresh gentle anime palette\nLighting: Warm sunlight from behind, backlight halo effect\nTechnical: anime illustration, highly detailed, cel-shaded, soft lineart, pastel color palette\nNegative: realistic, photorealistic, 3D render, ugly, deformed\nRatio: 1:1",
+      layers:[
+        {label:"① 風格定義",color:"#8B52CC",keyZh:"日系動漫插畫，精緻細膩畫風，Makoto Shinkai 電影光感",keyEn:"Japanese anime illustration, delicate refined style, Makoto Shinkai cinematic lighting",teach:"插畫提示詞最重要的是「風格語言」——直接點名風格流派（anime）、參考導演（Makoto Shinkai）讓 AI 對齊整個美學框架，比描述細節更有效。",joyce:"插畫提示詞最重要的是「風格語言」！直接點名 Makoto Shinkai 讓 AI 對齊整個電影光感美學，比說「好看的動漫」有用一百倍。"},
+        {label:"② 人物設定",color:"#A8C9A0",keyZh:"清澈大眼睛帶光點，飄動長髮，白色水手服，自然開心的表情",keyEn:"Clear large eyes with light reflections, flowing long hair, white sailor uniform, natural happy expression",teach:"動漫人物描述要強調「眼睛的細節」——眼睛帶光點（light reflections）是動漫角色最有靈氣的特徵，是讓角色「活起來」的關鍵詞。",joyce:"動漫人物一定要描述眼睛！Light reflections（眼睛帶光點）是讓角色「活起來」的關鍵，也是動漫風格最標誌性的視覺特徵。"},
+        {label:"③ 色彩系統",color:"#7A9EC9",keyZh:"淡粉、淡藍、米白——清新柔和的動漫色調，pastel color palette",keyEn:"Soft pink, light blue, ivory white — fresh gentle anime palette, pastel color palette",teach:"插畫的「色彩系統」比攝影的「光線」更重要——pastel color palette（粉彩色調）直接定義整張圖的色彩語言，讓 AI 知道要用柔和的、不飽和的色彩。",joyce:"插畫要定義色彩系統！Pastel color palette 直接告訴 AI 用柔和不飽和的粉彩色，比一個個說顏色更有效率。"},
+        {label:"④ 光線打法",color:"#A07AC9",keyZh:"從後方透入的溫暖陽光，逆光光暈效果",keyEn:"Warm sunlight from behind, backlight halo effect",teach:"動漫插畫的光線要用「電影感光」——從後方射入的逆光（backlight）配上光暈（halo effect）是 Makoto Shinkai 最標誌性的光線語言，讓整張圖充滿夢幻感。",joyce:"動漫插畫要用逆光！從後方射入的 backlight 配上 halo effect 是新海誠最標誌性的光線語言，讓整張圖充滿夢幻感。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"anime illustration, highly detailed, cel-shaded, soft lineart；負向詞：realistic, photorealistic",keyEn:"anime illustration, highly detailed, cel-shaded, soft lineart — Negative: realistic, photorealistic, 3D render",teach:"插畫的技術標籤跟攝影完全不同——cel-shaded（賽璐璐陰影）、soft lineart（柔和線稿）是動漫風格的核心技術詞；負向詞一定要加 realistic，防止 AI 往寫實方向跑。",joyce:"插畫的技術標籤跟攝影不一樣！Cel-shaded 和 soft lineart 是動漫風格的核心，負向詞一定加 realistic，不然 AI 很容易跑去生成寫實照片感的圖。"}
+      ]},
+    { title:"水彩插畫", badge:"藝術風格",
+      keyZh:"水彩手繪插畫風格，溫柔暈染，自然花卉構圖，米色紙張質感，筆觸可見，留白大量，清新文藝氛圍",
+      keyEn:"Watercolor illustration style, soft blending, natural floral composition, beige paper texture, visible brushstrokes, generous negative space, fresh artistic atmosphere",
+      fullZh:"風格：水彩手繪插畫，溫柔暈染效果，筆觸清晰可見\n主體：自然花卉構圖，野花、葉片、細枝，鬆散自然排列\n背景：米色舊紙張質感，留白大量，不填滿\n色彩：柔和水彩調——薰衣草紫、淡玫瑰粉、橄欖綠、象牙白\n媒材感：濕筆觸暈染，顏料邊緣自然擴散，紙張纖維可見\n技術：watercolor painting, hand-drawn, paper texture, wet brush strokes, artistic illustration\n負向詞：digital-looking, vector, sharp edges, flat design, photorealistic\n比例：1:1",
+      fullEn:"Style: Watercolor hand-drawn illustration, soft blending effect, visible brushstrokes\nSubject: Natural floral composition, wildflowers, leaves, fine branches, loosely arranged\nBackground: Beige aged paper texture, generous negative space, not filled\nColors: Soft watercolor tones — lavender purple, pale rose pink, olive green, ivory white\nMaterial feel: Wet brush blending, natural paint edge diffusion, paper fiber visible\nTechnical: watercolor painting, hand-drawn, paper texture, wet brush strokes, artistic illustration\nNegative: digital-looking, vector, sharp edges, flat design, photorealistic\nRatio: 1:1",
+      layers:[
+        {label:"① 風格定義",color:"#8B52CC",keyZh:"水彩手繪插畫，溫柔暈染效果，筆觸清晰可見",keyEn:"Watercolor hand-drawn illustration, soft blending effect, visible brushstrokes",teach:"水彩插畫要強調「手工感」——visible brushstrokes（筆觸可見）、hand-drawn（手繪）讓 AI 知道這不是數位向量圖，而是有溫度的手作質感。",joyce:"水彩要強調手工感！Visible brushstrokes（筆觸可見）和 hand-drawn 讓 AI 知道這不是數位圖，是有溫度的手作質感。"},
+        {label:"② 媒材感",color:"#A8C9A0",keyZh:"濕筆觸暈染，顏料邊緣自然擴散，米色舊紙張質感，紙張纖維可見",keyEn:"Wet brush blending, natural paint edge diffusion, beige aged paper texture, paper fiber visible",teach:"插畫的「媒材感」是靈魂——wet brush blending（濕筆觸暈染）描述的是顏料在紙上擴散的效果，這個詞讓 AI 生成出那種顏料自然流動的水彩質感。",joyce:"媒材感是水彩插畫的靈魂！Wet brush blending 讓 AI 生成顏料在紙上自然擴散的效果，這是水彩最獨特的視覺語言。"},
+        {label:"③ 色彩系統",color:"#7A9EC9",keyZh:"薰衣草紫、淡玫瑰粉、橄欖綠、象牙白——柔和水彩調",keyEn:"Lavender purple, pale rose pink, olive green, ivory white — soft watercolor tones",teach:"水彩的色彩系統要選「不飽和、有灰調」的顏色名稱——lavender purple（薰衣草紫）比直接說 purple 更有水彩的柔和感，暗示低飽和度的色調。",joyce:"水彩的顏色名稱要帶有灰調！Lavender purple 比 purple 更有水彩感，這種微妙的差異讓最終色調從「鮮豔」變成「柔美」。"},
+        {label:"④ 構圖留白",color:"#A07AC9",keyZh:"自然花卉鬆散自然排列，留白大量，不填滿",keyEn:"Loosely arranged natural floral composition, generous negative space, not filled",teach:"水彩插畫的構圖要強調「留白」——generous negative space（大量留白）是水彩美學的核心，讓圖看起來輕盈、有呼吸感，而不是塞滿元素的設計圖。",joyce:"水彩插畫一定要強調留白！Generous negative space 讓圖看起來輕盈、有呼吸感——水彩的美就在那個沒畫到的地方。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"watercolor painting, hand-drawn, paper texture；負向詞：digital-looking, vector, sharp edges",keyEn:"watercolor painting, hand-drawn, paper texture — Negative: digital-looking, vector, sharp edges",teach:"水彩插畫的負向詞非常重要：vector（向量圖）、sharp edges（銳利邊緣）、flat design（扁平設計）是水彩感最大的敵人，一定要加進去。",joyce:"水彩負向詞一定要加 vector 和 sharp edges！這兩個是水彩感最大的敵人，不加的話 AI 很容易把你的水彩畫成乾淨的設計圖。"}
+      ]},
+    { title:"賽博龐克城市", badge:"概念插畫",
+      keyZh:"賽博龐克霓虹城市夜景，高聳建築，電子廣告牌，霓虹反光濕地面，暗調藍紫，電影感構圖，高細節渲染",
+      keyEn:"Cyberpunk neon city night, towering buildings, digital billboards, neon-reflected wet pavement, dark blue purple, cinematic composition, highly detailed render",
+      fullZh:"風格：賽博龐克概念插畫，電影級細節渲染，Blade Runner 2049 美學\n場景：未來都市夜景，高聳摩天大樓，霓虹廣告牌，街道下著小雨\n色彩：深藍紫底調，霓虹紅、青藍、紫色點光源，高對比明暗\n地面：雨後濕地面反射霓虹燈光，完美倒影效果\n氛圍：孤獨的未來都市感，科技與人性的張力\n技術：cyberpunk, highly detailed, cinematic lighting, neon glow, rain reflections, 8K render\n負向詞：daytime, bright, cheerful, low detail, cartoon\n比例：16:9",
+      fullEn:"Style: Cyberpunk concept illustration, cinematic detail render, Blade Runner 2049 aesthetic\nScene: Futuristic city night, towering skyscrapers, neon billboards, light rain on streets\nColors: Deep blue-purple base, neon red, cyan blue, purple point lights, high contrast\nSurface: Wet pavement after rain reflecting neon lights, perfect mirror reflection\nAtmosphere: Lonely future city feeling, tension between technology and humanity\nTechnical: cyberpunk, highly detailed, cinematic lighting, neon glow, rain reflections, 8K render\nNegative: daytime, bright, cheerful, low detail, cartoon\nRatio: 16:9",
+      layers:[
+        {label:"① 風格定義",color:"#8B52CC",keyZh:"賽博龐克概念插畫，電影級細節渲染，Blade Runner 2049 美學",keyEn:"Cyberpunk concept illustration, cinematic detail render, Blade Runner 2049 aesthetic",teach:"概念插畫要直接點名「參考作品」——Blade Runner 2049 讓 AI 立刻知道要走什麼樣的視覺語言：暗調、電影感、精緻細節。",joyce:"概念插畫要直接點名參考作品！Blade Runner 2049 讓 AI 立刻知道整個視覺語言，比說賽博龐克更精準、更有說服力。"},
+        {label:"② 場景設定",color:"#A8C9A0",keyZh:"未來都市夜景，高聳摩天大樓，霓虹廣告牌，街道下著小雨",keyEn:"Futuristic city night, towering skyscrapers, neon billboards, light rain on streets",teach:"賽博龐克場景要給「高度感」和「天氣感」——towering（高聳）給城市壓迫感；light rain（小雨）讓地面產生反光，是賽博龐克最重要的視覺元素之一。",joyce:"賽博龐克場景一定要有雨！Light rain 讓地面產生霓虹反光，這個細節讓整個場景的電影感翻倍，是賽博龐克最標誌性的視覺元素。"},
+        {label:"③ 色彩系統",color:"#7A9EC9",keyZh:"深藍紫底調，霓虹紅、青藍、紫色點光源，高對比明暗",keyEn:"Deep blue-purple base, neon red, cyan blue, purple point lights, high contrast",teach:"賽博龐克的色彩系統是「暗底 + 彩色點光」——deep blue-purple（深藍紫）作為主調，霓虹色彩作為點綴光源。這個對比讓整個畫面有強烈的視覺張力。",joyce:"賽博龐克的色彩公式：深藍紫底調 + 霓虹色彩點光源！這個暗底配亮點的組合讓整個畫面有強烈的視覺張力，是賽博龐克最核心的色彩語言。"},
+        {label:"④ 光線反射",color:"#A07AC9",keyZh:"雨後濕地面反射霓虹燈光，完美倒影效果",keyEn:"Wet pavement after rain reflecting neon lights, perfect mirror reflection",teach:"「濕地面反光」是賽博龐克最重要的光線元素——rain reflections（雨後反光）讓地面變成一面鏡子，把城市的霓虹燈光倒映出來，大幅提升整個場景的精緻感。",joyce:"濕地面反光是賽博龐克的秘密武器！Rain reflections 讓地面變成鏡子，把霓虹燈光倒映出來，整個場景的精緻感立刻翻倍。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"cyberpunk, highly detailed, cinematic lighting, neon glow, 8K render；負向詞：daytime, bright, cartoon",keyEn:"cyberpunk, highly detailed, cinematic lighting, neon glow, 8K render — Negative: daytime, bright, cartoon",teach:"概念插畫的技術標籤要強調「細節密度」——highly detailed + 8K render 讓 AI 往高精細度的方向生成；負向詞加 daytime 和 bright 防止 AI 生成光線太亮的版本。",joyce:"概念插畫技術標籤要強調細節密度！Highly detailed + 8K render 讓 AI 往高精細度生成，負向詞加 daytime，不然 AI 可能生成一個陽光燦爛的賽博龐克城市，整個氣氛就垮掉了。"}
+      ]}
+  ]
+};
+
+// ═══ 文字海報 ═══
+const CAT_POSTER = {
+  id:"poster", color:"#D4494A", bg:"#FEF0F0", border:"rgba(212,73,74,.2)",
+  name:"文字海報", nameEn:"Text & Poster Design",
+  tagline:"版面結構 × 文案整合 × 品牌色，圖文並存",
+  ratio:"9:16", platforms:["GPT Image 2","Nano Banana Pro"],
+  icon:`<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="6" width="32" height="40" rx="3" stroke="white" stroke-width="1.5"/><line x1="13" y1="14" x2="35" y2="14" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="13" y1="20" x2="30" y2="20" stroke="white" stroke-width="1.2" stroke-linecap="round"/><rect x="13" y="26" width="22" height="10" rx="2" stroke="white" stroke-width="1.2"/><line x1="13" y1="40" x2="24" y2="40" stroke="white" stroke-width="1.2" stroke-linecap="round"/><circle cx="37" cy="40" r="4" stroke="white" stroke-width="1.2"/></svg>`,
+  ratios:["9:16","1:1","16:9"],
+  variants:[
+    { title:"健康美容品牌", badge:"品牌廣告",
+      keyZh:"深海軍藍背景（#0D1B2A），極簡保養品置中，香檳金文案排版，標題「Glow Naturally」，三點利益說明，CTA 按鈕，Glossier 遇見 Aesop 美學",
+      keyEn:"Deep navy background (#0D1B2A), minimal skincare centered, champagne gold typography, headline \"Glow Naturally\", benefit points, CTA button, Glossier meets Aesop",
+      fullZh:"版面：完整海報，頂部大標題，中間商品，下方三點利益，底部 CTA\n標題文字：「Glow Naturally」（高端襯線字體，白色或金色）\n副標：「Premium Skin Care for Everyday Beauty」\n利益點：✦ 純淨成分  ✦ 日日活力  ✦ 臨床驗證\nCTA：「立即選購」圓角膠囊按鈕，金色\n色彩：深海軍藍（#0D1B2A），香檳金點綴，純白文字\n光線：商品輪廓戲劇性棚拍光，背景放射狀光暈\n風格：Glossier 遇見 Aesop 美學，雜誌奢華感\n技術：印刷級品質，均衡文字層次，不含多餘元素\n負向詞：版面擁擠、廉價字體、顏色太多、業餘設計感\n比例：9:16",
+      fullEn:"Layout: Full poster — large headline top, product center, benefit points below, CTA bottom\nHeadline: \"Glow Naturally\" (premium serif font, white or gold)\nSubheadline: \"Premium Skin Care for Everyday Beauty\"\nBenefits: ✦ Pure Ingredients  ✦ Daily Vitality  ✦ Clinically Tested\nCTA: \"Shop Now\" rounded pill button, champagne gold\nColors: Deep navy (#0D1B2A), champagne gold accents, clean white text\nLighting: Dramatic studio rim on product, radial glow in background\nStyle: Glossier meets Aesop aesthetic, editorial luxury\nTechnical: Print-ready quality, balanced typographic hierarchy\nNegative: busy layout, cheap fonts, too many colors, amateur design\nRatio: 9:16",
+      layers:[
+        {label:"① 版面架構",color:"#D4494A",keyZh:"完整海報版面：頂部大標題 → 中間商品主視覺 → 下方利益點 → 底部 CTA 按鈕",keyEn:"Full poster: large headline top → product hero center → benefit points → CTA button bottom",teach:"廣告海報要先給 AI 版面結構，就像給設計師一個 wireframe。頂→中→下的閱讀動線，AI 才不會亂放元素。",joyce:"廣告海報要先給 AI 版面結構！就像給設計師 wireframe，頂→中→下的閱讀動線，AI 才不會亂放元素。"},
+        {label:"② 文案指定",color:"#A8C9A0",keyZh:"標題用引號指定「Glow Naturally」；副標、利益點、CTA 一一點名",keyEn:"Specify text in quotes: \"Glow Naturally\" — subheadline, benefits, CTA each named explicitly",teach:"要讓 AI 生成指定文字，一定要用引號！GPT Image 2、Nano Banana Pro 現在都能做到，但要在提示詞裡明確標出。",joyce:"要讓 AI 生成指定文字，一定要用引號！GPT Image 2 和 Nano Banana Pro 現在都能做到，超強的。"},
+        {label:"③ 色彩系統",color:"#7A9EC9",keyZh:"深海軍藍背景（#0D1B2A），香檳金點綴，純白文字，商品後方環境光暈",keyEn:"Deep navy background (#0D1B2A), champagne gold accents, white text, ambient glow behind product",teach:"廣告海報給顏色時，可以直接給 hex code（#0D1B2A）讓 AI 更精準。Ambient glow（環境光暈）是讓商品在深色背景上「發光浮起」的關鍵詞。",joyce:"直接給 hex 顏色碼讓 AI 更精準！Ambient glow（環境光暈）是讓商品在深色背景上發光浮起的魔法詞。"},
+        {label:"④ 品牌風格",color:"#A07AC9",keyZh:"高端健康美容品牌廣告，Glossier 遇見 Aesop 美學，雜誌奢華感",keyEn:"High-end wellness brand advertising, Glossier meets Aesop aesthetic, editorial luxury",teach:"指名參考品牌（Glossier、Aesop）是最快對齊風格的方式。一個 meets 就能混合兩種品牌美學，不用真實 logo。",joyce:"指名兩個品牌用 meets 連接，AI 就會混合兩種美學！Glossier meets Aesop 比說「高端風格」精準十倍。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"印刷級品質，均衡文字層次；負向詞：版面擁擠、廉價字體",keyEn:"Print-ready quality, balanced typographic hierarchy — Negative: busy layout, cheap-looking fonts",teach:"海報的技術詞重點是設計品質詞：print-ready（印刷級別）、balanced typographic hierarchy 讓 AI 從隨意擺放進入設計師思維。",joyce:"海報的技術詞是設計品質詞，不是相機！Print-ready 和 balanced typographic hierarchy 讓 AI 進入設計師思維。"}
+      ]},
+    { title:"科技新品發表", badge:"科技廣告",
+      keyZh:"純黑背景，科技產品浮起，電光藍光暈，「Next Level. Now.」現代無襯線字體，產品亮點說明，蘋果式極簡排版",
+      keyEn:"Pure black background, tech product floating, electric blue glow, \"Next Level. Now.\" modern sans-serif, product highlights, Apple-style minimal layout",
+      fullZh:"版面：科技發表風格，頂部品牌區，中間產品主視覺，下方亮點，底部 CTA\n標題：「Next Level. Now.」（現代無襯線字體，白色）\n副標：「Redefining What's Possible」\n亮點：⚡ 極速處理 · 🔋 超長續航 · 🛡️ 旗艦規格\nCTA：「立即搶購」深色按鈕，亮藍色輪廓\n色彩：純黑背景，電光藍點綴，純白文字，商品霓虹光暈\n風格：蘋果式極簡發表，科技未來感\n技術：印刷級，現代無襯線字體，極簡排版，無雜訊\n負向詞：暖色調、雜亂版面、廉價字體、過度裝飾\n比例：9:16",
+      fullEn:"Layout: Tech launch style — brand top, product hero center, highlights below, CTA bottom\nHeadline: \"Next Level. Now.\" (modern sans-serif, white)\nSubheadline: \"Redefining What's Possible\"\nHighlights: ⚡ Ultra Performance · 🔋 All-day Power · 🛡️ Flagship Grade\nCTA: \"Buy Now\" dark button with bright blue outline\nColors: Pure black background, electric blue accents, white text, neon product glow\nStyle: Apple-style minimal launch, futuristic tech\nTechnical: Print-ready, modern sans-serif, minimal layout, zero visual noise\nNegative: warm tones, cluttered layout, cheap fonts, excessive decoration\nRatio: 9:16",
+      layers:[
+        {label:"① 版面架構",color:"#D4494A",keyZh:"科技發表：頂部品牌區，中間產品最大最突出，下方規格亮點，底部 CTA",keyEn:"Tech launch: brand area top, product largest and most prominent center, highlights below, CTA bottom",teach:"科技海報的版面邏輯和美妝不同——上方是品牌識別，中間是產品（最大最突出），下方是規格亮點，最底是購買按鈕。",joyce:"科技海報版面邏輯跟美妝不一樣！品牌識別在最頂，產品要最大最突出，規格亮點在下方，CTA 在最底——這個順序是科技消費品的標配。"},
+        {label:"② 文案指定",color:"#A8C9A0",keyZh:"「Next Level. Now.」現代無襯線字體，亮點用 emoji 符號增加視覺節奏",keyEn:"\"Next Level. Now.\" modern sans-serif, highlights use emoji symbols for visual rhythm",teach:"科技廣告文案要「短、有力、有節奏」——Next Level. Now. 是典型科技廣告節奏。用 emoji 符號（⚡🔋🛡️）增加視覺節奏感。",joyce:"科技廣告文案要短而有力！Next Level. Now. 就是典型節奏，加上 emoji 讓亮點列表有視覺節奏，比純文字生動多了。"},
+        {label:"③ 色彩系統",color:"#7A9EC9",keyZh:"純黑背景，電光藍點綴，純白文字，商品霓虹光暈",keyEn:"Pure black background, electric blue accents, white text, neon product glow",teach:"科技廣告配色公式：純黑 + 電光藍 + 純白。Pure black 比深藍更有科技感；electric blue 比普通藍更有未來感。",joyce:"科技廣告配色公式：純黑 + 電光藍 + 純白！三者組合是蘋果式科技美學標配。"},
+        {label:"④ 品牌風格",color:"#A07AC9",keyZh:"蘋果式極簡發表，科技未來感，高端消費電子廣告",keyEn:"Apple-style minimal launch, futuristic tech, premium consumer electronics advertising",teach:"直接說「Apple-style」讓 AI 知道要做到什麼程度的極簡——留白多、字體大、產品在最清空的環境裡。",joyce:"直接說 Apple-style 讓 AI 知道要做到什麼程度的極簡！留白多、字體大、產品在最清空的環境裡，這就是科技廣告的語言。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"印刷級品質，現代無襯線字體，極簡排版；負向詞：暖色調、雜亂版面",keyEn:"Print-ready, modern sans-serif, minimal layout — Negative: warm tones, cluttered layout",teach:"科技海報的負向詞特別重要：warm tones（暖色調）會讓科技感全無；excessive decoration 跟科技極簡完全背道而馳。",joyce:"科技海報的負向詞超重要！加上 warm tones 和 excessive decoration，不然 AI 很容易給你一個充滿裝飾、暖烘烘的設計。"}
+      ]},
+    { title:"活動節慶海報", badge:"節慶視覺",
+      keyZh:"母親節溫馨海報，粉嫩花卉背景，溫柔優雅排版，「Happy Mother's Day」手寫字體，禮盒商品置中，粉白金色調",
+      keyEn:"Mother's Day warm poster, pink floral background, gentle elegant layout, \"Happy Mother's Day\" handwritten font, gift box centered, pink white gold palette",
+      fullZh:"版面：節慶海報，花卉裝飾邊框，標題置頂，商品置中，祝福語底部\n標題文字：「Happy Mother's Day」（手寫字體，玫瑰粉或金色）\n副標：「送給最愛的她」\n主視覺：精美禮盒或花束，置中，溫馨陳列\nCTA：「立即選購」柔和圓角按鈕，玫瑰金\n色彩：粉嫩玫瑰粉、象牙白、暖金色——溫柔節慶色調\n裝飾：水彩花卉元素，細膩花環邊框，飄落花瓣\n技術：elegant typography, floral decoration, soft pastel, warm and inviting\n負向詞：冷色調、硬邊框、科技感、暗沉\n比例：9:16",
+      fullEn:"Layout: Festive poster, floral decorative border, headline top, product center, greeting bottom\nHeadline: \"Happy Mother's Day\" (handwritten font, rose pink or gold)\nSubheadline: \"For the one you love most\"\nHero: Beautiful gift box or flower bouquet, centered, warmly displayed\nCTA: \"Shop Now\" soft rounded button, rose gold\nColors: Pale rose pink, ivory white, warm gold — tender festive palette\nDecoration: Watercolor floral elements, delicate floral wreath border, falling petals\nTechnical: elegant typography, floral decoration, soft pastel, warm and inviting\nNegative: cold tones, hard borders, tech feel, dark or gloomy\nRatio: 9:16",
+      layers:[
+        {label:"① 版面架構",color:"#D4494A",keyZh:"節慶海報：花卉裝飾邊框，標題置頂，商品置中，祝福語底部",keyEn:"Festive poster: floral decorative border, headline top, product center, greeting bottom",teach:"節慶海報的版面邏輯跟商業廣告不同——裝飾性元素（floral border）是主角之一，而不是干擾，要明確告訴 AI 邊框的位置和風格。",joyce:"節慶海報的裝飾元素是版面的一部分！Floral border（花卉邊框）要告訴 AI 放在哪裡、什麼風格，不然 AI 可能把花卉放在奇怪的地方。"},
+        {label:"② 文案指定",color:"#A8C9A0",keyZh:"「Happy Mother's Day」手寫字體，玫瑰粉或金色；副標「送給最愛的她」",keyEn:"\"Happy Mother's Day\" handwritten font, rose pink or gold — subheadline: \"For the one you love most\"",teach:"節慶文字要指定「字體風格」——handwritten font（手寫字體）是節慶海報的核心，讓整個版面有溫度感；要同時指定文字內容和字體風格。",joyce:"節慶海報文字要指定手寫字體！Handwritten font 讓整個版面有溫度感，跟科技廣告的無襯線字體是完全不同的情感語言。"},
+        {label:"③ 色彩系統",color:"#7A9EC9",keyZh:"粉嫩玫瑰粉、象牙白、暖金色——溫柔節慶色調",keyEn:"Pale rose pink, ivory white, warm gold — tender festive palette",teach:"節慶海報的配色要走「溫柔、有節日感」——pale rose pink（粉嫩玫瑰粉）+ warm gold（暖金色）是母親節最通用的配色組合，直接點名讓 AI 精準對齊。",joyce:"節慶配色要溫柔有節日感！Pale rose pink + warm gold 是母親節最通用的配色組合，直接點名讓 AI 精準對齊，不用擔心顏色跑偏。"},
+        {label:"④ 裝飾元素",color:"#A07AC9",keyZh:"水彩花卉元素，細膩花環邊框，飄落花瓣",keyEn:"Watercolor floral elements, delicate floral wreath border, falling petals",teach:"節慶海報的裝飾元素要「有層次」——watercolor floral（水彩花卉）作為背景質感，wreath border（花環邊框）作為結構，falling petals（飄落花瓣）作為動態感，三層缺一不可。",joyce:"節慶裝飾要有三個層次！水彩花卉是質感，花環邊框是結構，飄落花瓣是動態感，三層一起給 AI，整個畫面才會豐富但不凌亂。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"elegant typography, floral decoration, soft pastel；負向詞：冷色調、硬邊框、科技感",keyEn:"elegant typography, floral decoration, soft pastel — Negative: cold tones, hard borders, tech feel",teach:"節慶海報的負向詞要針對性地排除「反節慶感」的元素：cold tones（冷色調）和 tech feel（科技感）是最常見的問題，一定要加進負向詞。",joyce:"節慶海報負向詞要排除反節慶感的元素！Cold tones 和 tech feel 是最常見的問題，不加的話 AI 可能給你一個冷冰冰的科技風母親節海報，整個就垮了。"}
+      ]}
+  ]
+};
+
+// ═══ 概念創意（前3個 variants）===
+const CAT_CONCEPT = {
+  id:"concept", color:"#2E86C1", bg:"#EAF4FB", border:"rgba(46,134,193,.2)",
+  name:"概念創意", nameEn:"Concept & Creative Vision",
+  tagline:"視覺比喻 × 超現實組合 × 敘事張力，打破現實",
+  ratio:"16:9", platforms:["GPT Image 2","Nano Banana Pro"],
+  icon:`<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="22" r="12" stroke="white" stroke-width="1.5"/><path d="M20 22C20 22 22 18 24 22C26 26 28 22 28 22" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M24 34V42" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M20 42H28" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M8 10L12 14" stroke="white" stroke-width="1.2" stroke-linecap="round"/><path d="M40 10L36 14" stroke="white" stroke-width="1.2" stroke-linecap="round"/><path d="M4 24H8" stroke="white" stroke-width="1.2" stroke-linecap="round"/><path d="M40 24H44" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+  ratios:["16:9","1:1","4:5"],
+  variants:[
+    { title:"書本中的宇宙", badge:"超現實概念",
+      keyZh:"翻開的古書中升起浩瀚星河，書頁化為銀河，微型星球漂浮書頁之間，金色光芒從書脊散發，奇幻超現實，極致細節",
+      keyEn:"Open ancient book with vast galaxy rising from pages, book pages transforming into Milky Way, miniature planets floating between pages, golden light emanating from spine, surreal fantasy, extreme detail",
+      fullZh:"概念：翻開的古書中升起浩瀚星河，知識與宇宙的視覺比喻\n主體：皮革封面古書，翻開的書頁化為銀河星雲，微型星球漂浮其中\n光線：金色光芒從書脊中心散發，星光點點，深邃的宇宙藍紫背景\n細節：書頁邊緣泛黃，文字細節，塵埃粒子在光線中漂浮\n氛圍：奇幻、神聖、對知識的崇敬，Rene Magritte 超現實主義美學\n技術：surrealism, photorealistic, extremely detailed, cinematic lighting, 8K, concept art\n負向詞：cartoon, simple, low detail, flat\n比例：16:9",
+      fullEn:"Concept: Open ancient book with vast galaxy rising from pages, visual metaphor of knowledge and universe\nSubject: Leather-bound ancient book, open pages transforming into galactic nebula, miniature planets floating within\nLighting: Golden light emanating from center spine, starlight scattered, deep cosmic blue-purple background\nDetail: Yellowed page edges, text details visible, dust particles floating in light beams\nAtmosphere: Fantastical, sacred, reverence for knowledge, Rene Magritte surrealist aesthetic\nTechnical: surrealism, photorealistic, extremely detailed, cinematic lighting, 8K, concept art\nNegative: cartoon, simple, low detail, flat\nRatio: 16:9",
+      layers:[
+        {label:"① 概念核心",color:"#2E86C1",keyZh:"翻開的古書中升起浩瀚星河，知識與宇宙的視覺比喻",keyEn:"Open ancient book with vast galaxy rising from pages, visual metaphor of knowledge and universe",teach:"概念創意的第一步是「定義視覺比喻」——把抽象概念（知識 = 宇宙）轉化為具體的視覺場景（書頁化為銀河）。這個轉化要在提示詞的第一句話就說清楚。",joyce:"概念創意的核心是視覺比喻！把抽象概念轉化為具體場景，第一句話就要說清楚這個比喻——AI 才知道你要的不是一本普通的書，而是一個哲學性的視覺宣言。"},
+        {label:"② 主體設定",color:"#A8C9A0",keyZh:"皮革封面古書，翻開的書頁化為銀河星雲，微型星球漂浮其中",keyEn:"Leather-bound ancient book, open pages transforming into galactic nebula, miniature planets floating within",teach:"概念插畫的主體設定要給「轉化的過程」——pages transforming into（書頁化為）這種描述動詞讓 AI 知道這兩個元素（書和星河）是同一個東西的不同狀態，不是分開的兩樣東西。",joyce:"概念創意要描述轉化的過程！Pages transforming into（書頁化為）這種描述讓 AI 知道書和星河是同一個東西的不同狀態，這才是超現實的核心魔法。"},
+        {label:"③ 光線氛圍",color:"#7A9EC9",keyZh:"金色光芒從書脊中心散發，星光點點，深邃的宇宙藍紫背景",keyEn:"Golden light emanating from center spine, starlight scattered, deep cosmic blue-purple background",teach:"概念創意的光線要「有來源、有方向、有戲劇性」——golden light emanating from（金色光芒從…散發）給光線一個具體的出發點，讓整個場景有光源邏輯，不是隨機照亮。",joyce:"概念創意的光線要有來源！Golden light emanating from center spine（金色光芒從書脊散發）給光線一個邏輯起點，讓整個場景的光更有說服力、更有戲劇性。"},
+        {label:"④ 細節密度",color:"#A07AC9",keyZh:"書頁邊緣泛黃，文字細節，塵埃粒子在光線中漂浮",keyEn:"Yellowed page edges, text details visible, dust particles floating in light beams",teach:"概念創意的「細節密度」決定真實感——yellowed page edges（書頁邊緣泛黃）、dust particles（塵埃粒子）這些微小細節讓超現實場景反而更有真實感，反差感讓整個圖更震撼。",joyce:"細節密度是概念創意的真實感來源！塵埃粒子、泛黃書頁——這些微小細節讓超現實場景反而更可信，反差感讓整個圖更讓人驚艷。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"surrealism, photorealistic, extremely detailed, cinematic lighting, 8K；負向詞：cartoon, simple, flat",keyEn:"surrealism, photorealistic, extremely detailed, cinematic lighting, 8K — Negative: cartoon, simple, flat",teach:"概念創意的技術詞要同時強調「超現實」和「寫實細節」——surrealism（超現實）定義概念方向，photorealistic（寫實渲染）定義細節質感，兩個詞同時出現是概念創意提示詞的核心矛盾張力。",joyce:"概念創意要同時強調 surrealism 和 photorealistic！超現實的概念 + 寫實的細節，這個矛盾張力才是概念創意最吸引人的地方，也是最難但最值得學的提示詞組合。"}
+      ]},
+    { title:"人與自然融合", badge:"生態概念",
+      keyZh:"女性側臉剪影，頭髮化為茂密森林，樹根延伸至下巴，鳥兒從髮梢飛起，綠色生命力，超現實自然主義",
+      keyEn:"Female profile silhouette, hair transforming into dense forest, tree roots extending to chin, birds flying from hair tips, green vitality, surrealist naturalism",
+      fullZh:"概念：女性側臉與茂密森林融為一體，人與自然的視覺比喻\n主體：女性側臉剪影，頭髮有機化為森林樹木，樹根延伸至下巴和頸部\n細節：鳥兒從髮梢飛起，葉片點綴，晨霧從樹間升起\n色彩：深綠、苔蘚綠、薄霧白、柔和光感\n光線：側方柔和晨光，穿過樹葉的光束（光線束效果）\n氛圍：靜謐、生命力、人類與自然不可分割\n技術：surrealism, conceptual art, photorealistic, double exposure effect, highly detailed\n負向詞：obvious composite, unnatural, cartoon, low quality\n比例：4:5",
+      fullEn:"Concept: Female profile and dense forest merging as one, visual metaphor of human and nature\nSubject: Female profile silhouette, hair organically transforming into forest trees, tree roots extending to chin and neck\nDetail: Birds flying from hair tips, leaves scattered, morning mist rising between trees\nColors: Deep green, moss green, misty white, soft luminous\nLighting: Soft side morning light, light beams through leaves (god ray effect)\nAtmosphere: Serene, vitality, inseparability of human and nature\nTechnical: surrealism, conceptual art, photorealistic, double exposure effect, highly detailed\nNegative: obvious composite, unnatural, cartoon, low quality\nRatio: 4:5",
+      layers:[
+        {label:"① 概念核心",color:"#2E86C1",keyZh:"女性側臉與茂密森林融為一體，人與自然的視覺比喻",keyEn:"Female profile and dense forest merging as one, visual metaphor of human and nature",teach:"人與自然融合這個概念要強調「有機的轉化」——organically transforming（有機化為）比直接說 mixed（混合）更讓 AI 理解這是一個流暢的、自然生長的融合，而不是生硬的合成。",joyce:"人與自然融合要強調「有機轉化」！Organically transforming 比 mixed 更讓 AI 理解這是流暢生長的融合，而不是 PS 合成感。"},
+        {label:"② 主體設定",color:"#A8C9A0",keyZh:"女性側臉剪影，頭髮有機化為森林樹木，樹根延伸至下巴和頸部",keyEn:"Female profile silhouette, hair organically transforming into forest trees, tree roots extending to chin and neck",teach:"雙重曝光式的概念要給「轉化的邊界」——tree roots extending to chin and neck（樹根延伸至下巴和頸部）指定了融合發生的身體部位，讓 AI 知道轉化不是隨機的，而是有邏輯的流動。",joyce:"雙重曝光要給轉化的邊界！Tree roots extending to chin 指定了融合發生的具體位置，讓 AI 知道這個轉化是有邏輯流動的，不是隨機的貼合。"},
+        {label:"③ 細節層次",color:"#7A9EC9",keyZh:"鳥兒從髮梢飛起，葉片點綴，晨霧從樹間升起",keyEn:"Birds flying from hair tips, leaves scattered, morning mist rising between trees",teach:"概念創意的細節要「有動態感」——birds flying from hair tips（鳥兒從髮梢飛起）和 morning mist rising（晨霧升起）讓靜態的圖有了時間感和生命感，是讓觀者停住細看的關鍵。",joyce:"概念創意的細節要有動態感！鳥兒飛起、晨霧升起——這些動態細節讓靜態圖有了時間感和生命感，是讓觀者停下來細看的關鍵。"},
+        {label:"④ 光線氛圍",color:"#A07AC9",keyZh:"側方柔和晨光，穿過樹葉的光束（god ray 效果）",keyEn:"Soft side morning light, light beams through leaves (god ray effect)",teach:"「God ray」（耶穌光、光束效果）是概念插畫常用的光線術語——指的是光穿過樹葉或霧氣形成的放射性光束，這個術語讓 AI 知道要生成那種神聖的、有方向性的光線感。",joyce:"God ray 是概念插畫的光線魔法詞！光穿過樹葉形成放射性光束，這個術語讓 AI 知道要生成那種神聖感的光線，整個氛圍立刻提升一個層次。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"surrealism, conceptual art, photorealistic, double exposure effect；負向詞：obvious composite, cartoon",keyEn:"surrealism, photorealistic, double exposure effect — Negative: obvious composite, unnatural, cartoon",teach:"雙重曝光的關鍵技術詞是 double exposure effect——但要同時加 photorealistic 讓融合看起來自然而不是生硬的 Photoshop 合成感；負向詞加 obvious composite 防止 AI 生成看起來很假的合成圖。",joyce:"雙重曝光一定加 double exposure effect，同時加 photorealistic 讓融合看起來自然！負向詞加 obvious composite，防止 AI 生成那種一眼就看出是 PS 合成的假感。"}
+      ]},
+    { title:"微縮世界", badge:"創意視覺",
+      keyZh:"手掌上的微縮城市，摩天大樓如玩具般精緻，微型人物生活其中，景深模糊效果，移軸攝影感，溫暖陽光俯瞰",
+      keyEn:"Miniature city on palm of hand, skyscrapers delicate as toys, tiny people living within, depth of field blur, tilt-shift photography feel, warm sunlight aerial view",
+      fullZh:"概念：人類手掌上托著一座完整的微縮城市，尺度錯位的視覺衝擊\n主體：一隻手掌向上托起，掌心上有精緻的微縮城市，摩天大樓、道路、公園、微型人物\n景深：移軸攝影效果，城市邊緣模糊，中心清晰，強調微縮感\n光線：溫暖黃金時刻陽光從上方斜射，城市投射細小陰影\n細節：微型路燈、小車、植物、建築物窗戶反光\n技術：tilt-shift photography, miniature effect, macro photography, highly detailed, warm golden light\n負向詞：dark, gloomy, unrealistic scale, cartoon\n比例：1:1",
+      fullEn:"Concept: Complete miniature city resting on human palm, visual impact of scale displacement\nSubject: Upward-facing palm, delicate miniature city on the palm with skyscrapers, roads, parks, tiny people\nDepth of field: Tilt-shift photography effect, city edges blurred, center sharp, emphasizing miniature feel\nLighting: Warm golden hour sunlight angled from above, city casting tiny shadows\nDetail: Miniature streetlights, tiny cars, plants, building window reflections\nTechnical: tilt-shift photography, miniature effect, macro photography, highly detailed, warm golden light\nNegative: dark, gloomy, unrealistic scale, cartoon\nRatio: 1:1",
+      layers:[
+        {label:"① 概念核心",color:"#2E86C1",keyZh:"人類手掌上托著一座完整的微縮城市，尺度錯位的視覺衝擊",keyEn:"Complete miniature city resting on human palm, visual impact of scale displacement",teach:"微縮世界的概念核心是「尺度錯位」——scale displacement（尺度錯位）是讓觀者產生視覺衝擊的關鍵，要在提示詞裡明確指出大物件（手掌）和小物件（城市）的對比關係。",joyce:"微縮世界的魔法是尺度錯位！大手掌 + 微縮城市這個對比關係要在提示詞裡說清楚，AI 才知道這不是一個普通的城市，而是一個被手掌托著的玩具世界。"},
+        {label:"② 主體設定",color:"#A8C9A0",keyZh:"一隻手掌向上托起，掌心上有精緻的微縮城市，摩天大樓、道路、公園、微型人物",keyEn:"Upward-facing palm, delicate miniature city on the palm with skyscrapers, roads, parks, tiny people",teach:"微縮世界的主體設定要「列舉城市的組成元素」——skyscrapers、roads、parks、tiny people 這些具體元素讓 AI 知道要生成一個「完整的」微縮城市，而不是只有幾棟建築。",joyce:"微縮城市要列舉組成元素！摩天大樓、道路、公園、微型人物——具體列出這些讓 AI 生成一個完整的微縮世界，而不是只有幾棟空洞的建築。"},
+        {label:"③ 景深效果",color:"#7A9EC9",keyZh:"移軸攝影效果，城市邊緣模糊，中心清晰，強調微縮感",keyEn:"Tilt-shift photography effect, city edges blurred, center sharp, emphasizing miniature feel",teach:"「Tilt-shift photography」（移軸攝影）是微縮世界最重要的技術詞——移軸鏡頭讓真實場景看起來像模型，是視覺上欺騙大腦「這是玩具」的核心效果，一個詞就能讓整個概念成立。",joyce:"Tilt-shift photography 是微縮世界的核心技術詞！移軸攝影讓真實場景看起來像模型，一個詞就能讓整個微縮效果成立，這是概念創意裡最有技術含量的提示詞之一。"},
+        {label:"④ 光線細節",color:"#A07AC9",keyZh:"溫暖黃金時刻陽光從上方斜射，城市投射細小陰影",keyEn:"Warm golden hour sunlight angled from above, city casting tiny shadows",teach:"微縮世界的光線要「符合物理邏輯」——從上方斜射的陽光（angled from above）配合城市投射的細小陰影，讓整個場景的光線邏輯一致，是讓觀者相信這個微縮世界「真實存在」的關鍵。",joyce:"微縮世界的光線要符合物理邏輯！從上方斜射的陽光讓城市投射細小陰影，這個物理一致性讓觀者相信這個微縮世界是真實存在的，而不是 AI 隨意生成的。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"tilt-shift photography, miniature effect, macro photography, highly detailed；負向詞：dark, cartoon",keyEn:"tilt-shift photography, miniature effect, macro photography, highly detailed — Negative: dark, cartoon",teach:"微縮世界的技術詞三連：tilt-shift photography（移軸攝影）+ miniature effect（微縮效果）+ macro photography（微距攝影）——三個詞從不同角度強化「這是一個微縮世界」的視覺邏輯。",joyce:"微縮世界技術詞三連：tilt-shift + miniature effect + macro photography！三個詞從不同角度強化微縮視覺邏輯，同時出現的說服力遠大於只用一個詞。"}
+      ]}
+  ]
+};
+
+// 接續 時間的重量 ① 概念核心
+// 以及概念創意剩餘 3 個範例
+
+// 補完 CAT_CONCEPT 的最後 3 個 variants
+const CAT_CONCEPT_EXTRA = [
+    { title:"時間的重量", badge:"哲學視覺", ratio:"16:9",
+      keyZh:"巨型沙漏漂浮在荒漠廢墟中，沙子化為星辰，廢棄文明在沙漏內部，Salvador Dali 風格，史詩感，photorealistic 極致細節",
+      keyEn:"Giant hourglass floating above desert ruins, sand transforming into stars, abandoned civilization inside hourglass, Salvador Dali style, epic feel, photorealistic extreme detail",
+      fullZh:"概念：巨型沙漏漂浮在荒漠廢墟上方，沙子化為星辰，時間與文明的視覺比喻\n主體：巨型透明沙漏，漂浮在廢棄沙漠文明廢墟上方，沙漏內部有廢棄的建築和文物，沙子流下時化為繁星\n環境：荒漠廢墟，古老文明遺跡，金色沙塵，史詩感廣角\n光線：戲劇性逆光，沙漏發光，天空在夕陽與星空之間的過渡時刻\n技術：surrealism, photorealistic, Salvador Dali style, epic concept art, extremely detailed, 8K\n負向詞：cartoon, simple, low detail, bright cheerful",
+      fullEn:"Concept: Giant hourglass floating above desert ruins, sand transforming into stars, visual metaphor of time and civilization\nSubject: Giant transparent hourglass floating above abandoned desert civilization ruins, inside contains abandoned buildings and artifacts, sand flowing down transforms into stars\nEnvironment: Desert ruins, ancient civilization remnants, golden sand dust, epic wide angle\nLighting: Dramatic backlight, hourglass glowing, sky transitioning between sunset and starry sky\nTechnical: surrealism, photorealistic, Salvador Dali style, epic concept art, extremely detailed, 8K\nNegative: cartoon, simple, low detail, bright cheerful",
+      layers:[
+        {label:"① 概念核心",color:"#2E86C1",keyZh:"巨型沙漏漂浮在荒漠廢墟上方，沙子化為星辰，時間與文明的視覺比喻",keyEn:"Giant hourglass floating above desert ruins, sand transforming into stars, visual metaphor of time and civilization",teach:"哲學視覺的概念要「多層比喻」——沙漏（時間）+ 星辰（宇宙/永恆）+ 廢墟（文明的興衰），三個符號同時在一個畫面中互相呼應，讓單一畫面承載多重意義。",joyce:"哲學視覺要多層比喻！沙漏代表時間、星辰代表永恆、廢墟代表文明興衰——三個符號在同一畫面中互相呼應，讓一張圖承載多重哲學意義，這是概念創意最高難度也最震撼的形式。"},
+        {label:"② 主體設定",color:"#A8C9A0",keyZh:"巨型透明沙漏漂浮廢墟上方，內部有廢棄建築和文物，沙子流下時化為繁星",keyEn:"Giant transparent hourglass floating above ruins, inside contains abandoned buildings and artifacts, sand flowing down transforms into stars",teach:"哲學視覺的主體要「有內部世界」——沙漏內部有廢棄的建築和文物（inside contains abandoned buildings and artifacts）讓沙漏不只是沙漏，而是一個可以進入的世界，增加了視覺的深度和複雜度。",joyce:"哲學視覺的主體要有內部世界！沙漏內部有廢棄建築和文物，讓沙漏不只是沙漏，而是一個可以進入的世界——這種「容器內有世界」的設定是概念創意最有衝擊力的視覺策略。"},
+        {label:"③ 環境氛圍",color:"#7A9EC9",keyZh:"荒漠廢墟，古老文明遺跡，金色沙塵，史詩感廣角",keyEn:"Desert ruins, ancient civilization remnants, golden sand dust, epic wide angle",teach:"哲學視覺的環境要「有史詩感的尺度」——epic wide angle（史詩感廣角）讓整個場景有電影大製作的規模感；golden sand dust（金色沙塵）讓整個環境色調統一，有電影感的後製質感。",joyce:"哲學視覺要有史詩感的尺度！Epic wide angle 讓整個場景有電影大製作的規模感，golden sand dust 讓環境色調統一，整個畫面就像一張電影概念設計圖。"},
+        {label:"④ 光線戲劇",color:"#A07AC9",keyZh:"戲劇性逆光，沙漏發光，天空在夕陽與星空之間的過渡時刻",keyEn:"Dramatic backlight, hourglass glowing, sky transitioning between sunset and starry sky",teach:"哲學視覺的光線要「在兩個世界之間」——sky transitioning between sunset and starry sky（天空在夕陽與星空之間的過渡時刻）讓整個場景在兩種時間狀態之間，既是白天又是夜晚，這種時間上的模糊感完美呼應了「時間的重量」這個主題。",joyce:"哲學視覺的光線要在兩個世界之間！天空在夕陽與星空之間的過渡時刻，讓場景既是白天又是夜晚——這種時間模糊感完美呼應時間主題，是讓視覺和概念完美統一的打光策略。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"surrealism, photorealistic, Salvador Dali style, 8K；負向詞：cartoon, simple, bright cheerful",keyEn:"surrealism, photorealistic, Salvador Dali style, 8K — Negative: cartoon, simple, bright cheerful",teach:"哲學概念插畫要點名 Salvador Dali——達利的超現實主義風格（融化的鐘錶、荒漠中的巨型物件）和這個概念完美契合；AI 對達利的視覺語言有深度的訓練資料，點名他讓整個畫面的史詩感和超現實感自動對齊。",joyce:"哲學概念一定要點名 Salvador Dali！達利的超現實風格（荒漠中的巨型物件）和這個概念完美契合，AI 對達利有深度訓練資料，點名他讓整個畫面的史詩感自動到位。"}
+      ]},
+    { title:"城市叢林", badge:"生態反思", ratio:"16:9",
+      keyZh:"廢棄都市被熱帶叢林完全吞噬，建築在植物中若隱若現，蔓延的藤蔓和巨樹，生機勃勃的末世感，golden hour 光線，photorealistic",
+      keyEn:"Abandoned city completely swallowed by tropical jungle, buildings visible through vegetation, sprawling vines and giant trees, vibrant post-apocalyptic feel, golden hour lighting, photorealistic",
+      fullZh:"概念：廢棄都市被熱帶叢林完全吞噬，自然重新奪回城市的視覺隱喻\n場景：廢棄的現代城市，高樓在茂密熱帶植物中若隱若現，蔓延的藤蔓爬滿建築，巨型熱帶樹木從街道長出\n細節：廢棄汽車被植物包覆，窗戶長出植物，地面裂縫中長出樹根，鳥類和昆蟲\n光線：黃金時刻陽光穿透葉片，形成無數細碎光點，整體暖調\n氛圍：生機勃勃的末世感，不是悲劇而是重生\n技術：photorealistic, concept art, cinematic lighting, highly detailed, 8K\n負向詞：dark apocalyptic, lifeless, nuclear wasteland, cartoon",
+      fullEn:"Concept: Abandoned city completely swallowed by tropical jungle, nature reclaiming the city as visual metaphor\nScene: Abandoned modern city, skyscrapers visible through dense tropical vegetation, sprawling vines covering buildings, giant tropical trees growing from streets\nDetail: Abandoned cars wrapped in plants, windows overgrown, tree roots in pavement cracks, birds and insects\nLighting: Golden hour sunlight filtering through leaves, creating countless dappled light spots, overall warm tone\nAtmosphere: Vibrant post-apocalyptic feel, not tragic but rebirth\nTechnical: photorealistic, concept art, cinematic lighting, highly detailed, 8K\nNegative: dark apocalyptic, lifeless, nuclear wasteland, cartoon",
+      layers:[
+        {label:"① 概念核心",color:"#2E86C1",keyZh:"廢棄都市被熱帶叢林完全吞噬，自然重新奪回城市的視覺隱喻",keyEn:"Abandoned city completely swallowed by tropical jungle, nature reclaiming the city as visual metaphor",teach:"生態概念要強調「自然的主動性」——nature reclaiming the city（自然重新奪回城市）讓自然成為主角，而不是被動的受害者；completely swallowed（完全吞噬）強調了自然的力量已經完全壓過了人類文明。",joyce:"生態概念要強調自然的主動性！Nature reclaiming the city 讓自然成為主角，completely swallowed 強調自然的力量已經壓過了人類文明——這個主動的語氣讓整個概念更有力量。"},
+        {label:"② 場景細節",color:"#A8C9A0",keyZh:"廢棄汽車被植物包覆，窗戶長出植物，地面裂縫中長出樹根",keyEn:"Abandoned cars wrapped in plants, windows overgrown, tree roots in pavement cracks",teach:"生態叢林的細節要「展示時間的痕跡」——cars wrapped in plants（汽車被植物包覆）、roots in pavement cracks（地面裂縫中的樹根）讓觀者感受到這個廢棄已經發生了很長時間，是一個緩慢但徹底的過程。",joyce:"生態叢林的細節要展示時間的痕跡！汽車被植物包覆、地面裂縫中的樹根——這些細節讓觀者感受到廢棄已經發生很長時間，是一個緩慢但徹底的過程，讓整個場景更有故事性。"},
+        {label:"③ 光線氛圍",color:"#7A9EC9",keyZh:"黃金時刻陽光穿透葉片，形成無數細碎光點，整體暖調",keyEn:"Golden hour sunlight filtering through leaves, creating countless dappled light spots, overall warm tone",teach:"生態場景的光線要「穿透性的、充滿生命感」——sunlight filtering through leaves（陽光穿透葉片）形成的 dappled light（細碎光點）是自然場景最生動的光線效果，讓整個廢棄城市充滿生命力，而不是陰暗的末日感。",joyce:"生態場景的光要穿透性的、充滿生命感！陽光穿透葉片形成的細碎光點是自然場景最生動的光線效果，讓廢棄城市充滿生命力，而不是陰暗的末日感——這個打光策略讓整個概念從悲劇變成重生。"},
+        {label:"④ 氣質定調",color:"#A07AC9",keyZh:"生機勃勃的末世感，不是悲劇而是重生",keyEn:"Vibrant post-apocalyptic feel, not tragic but rebirth",teach:"生態概念的氣質要「正面的末世感」——vibrant post-apocalyptic（生機勃勃的末世感）是一個看似矛盾的組合，但正是這種矛盾讓概念更有深度；not tragic but rebirth（不是悲劇而是重生）直接告訴 AI 整個情感基調是正面的，是希望而不是絕望。",joyce:"生態概念要有正面的末世感！Vibrant post-apocalyptic 是看似矛盾的組合，but rebirth 直接告訴 AI 整個情感基調是希望而不是絕望——這個情感定調讓整個概念從末日恐怖變成充滿生機的哲學思考。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"photorealistic, concept art, cinematic lighting, 8K；負向詞：dark apocalyptic, lifeless, nuclear wasteland",keyEn:"photorealistic, concept art, cinematic lighting, 8K — Negative: dark apocalyptic, lifeless, nuclear wasteland",teach:"生態概念的負向詞要明確排除「錯誤的末日感」：dark apocalyptic（黑暗末日感）和 lifeless（無生命感）是這個概念最大的威脅，讓整個場景從充滿生機的自然重生變成壓抑的末日廢土。",joyce:"生態概念負向詞一定加 dark apocalyptic 和 lifeless！這兩個是最大的威脅，不加的話 AI 很容易把充滿生機的自然重生場景生成成壓抑的核戰廢土，整個概念的正面能量就消失了。"}
+      ]},
+    { title:"液態金屬人物", badge:"未來概念", ratio:"4:5",
+      keyZh:"液態鉻金屬人形，半溶解半固體狀態，鏡面反射周圍環境，水銀般的流動感，工作室純黑背景，戲劇性光線，T-1000 風格，photorealistic 8K",
+      keyEn:"Liquid chrome metal humanoid figure, half-dissolved half-solid state, mirror-reflecting surrounding environment, mercury-like flow, studio pure black background, dramatic lighting, T-1000 style, photorealistic 8K",
+      fullZh:"概念：液態鉻金屬人形，探索物質與身份的界限\n主體：人形輪廓，半溶解半固體狀態，身體部分化為液態金屬流動，部分保持人形\n材質：完美鏡面鉻金屬，反射周圍環境，水銀般的液體流動\n背景：純黑工作室背景，讓金屬的鏡面反射最大化顯現\n光線：多方向戲劇性棚光，在鉻金屬表面形成複雜的光影反射，每個角度都有不同的光線折射\n技術：photorealistic, liquid metal, chrome material, highly detailed, cinematic lighting, 8K render\n負向詞：matte surface, cartoon, flat, low detail, human skin texture",
+      fullEn:"Concept: Liquid chrome metal humanoid, exploring boundaries of matter and identity\nSubject: Humanoid outline, half-dissolved half-solid state, body parts transforming into flowing liquid metal, parts retaining human form\nMaterial: Perfect mirror chrome metal, reflecting surrounding environment, mercury-like liquid flow\nBackground: Pure black studio background, maximizing chrome mirror reflection\nLighting: Multi-directional dramatic studio lighting, creating complex light and shadow reflections on chrome surface, different light refraction from every angle\nTechnical: photorealistic, liquid metal, chrome material, highly detailed, cinematic lighting, 8K render\nNegative: matte surface, cartoon, flat, low detail, human skin texture",
+      layers:[
+        {label:"① 概念核心",color:"#2E86C1",keyZh:"液態鉻金屬人形，半溶解半固體狀態，探索物質與身份的界限",keyEn:"Liquid chrome metal humanoid, half-dissolved half-solid state, exploring boundaries of matter and identity",teach:"材質轉化概念要強調「中間狀態」——half-dissolved half-solid（半溶解半固體）讓 AI 知道這個人物不完全是固體也不完全是液體，而是在兩種狀態之間的過渡，這種模糊性讓整個概念充滿張力。",joyce:"材質轉化概念要強調中間狀態！Half-dissolved half-solid 讓 AI 知道這個人物在固體和液體之間的過渡狀態，這種模糊性讓整個概念充滿張力——中間狀態比完全的固體或液體更有視覺衝擊力。"},
+        {label:"② 材質定義",color:"#A8C9A0",keyZh:"完美鏡面鉻金屬，反射周圍環境，水銀般的液體流動",keyEn:"Perfect mirror chrome metal, reflecting surrounding environment, mercury-like liquid flow",teach:"液態金屬的材質描述要「強調反射性」——mirror chrome（鏡面鉻金屬）讓 AI 知道這個材質是完全反光的，能反射周圍環境；mercury-like（水銀般的）是描述液態金屬流動質感最精準的詞，讓 AI 知道流動的方式是黏稠、有重量感的。",joyce:"液態金屬材質要強調反射性！Mirror chrome 讓 AI 知道材質完全反光能反射周圍環境，mercury-like 是描述液態金屬流動最精準的詞——水銀般的黏稠重量感，這兩個詞組合讓材質感完全到位。"},
+        {label:"③ 光線打法",color:"#7A9EC9",keyZh:"多方向戲劇性棚光，在鉻金屬表面形成複雜的光影反射，每個角度都有不同的光線折射",keyEn:"Multi-directional dramatic studio lighting, complex reflections on chrome surface, different refraction from every angle",teach:"鏡面材質的打光要「多方向」——multi-directional lighting（多方向打光）讓鉻金屬表面從不同角度各自反射不同的光，製造視覺上複雜豐富的反射效果；單一方向的光打在鉻金屬上只會看到一個光點，多方向才能讓鉻金屬的特性完整呈現。",joyce:"鏡面材質要用多方向打光！Multi-directional lighting 讓鉻金屬從不同角度各自反射不同的光，製造複雜豐富的反射效果——單一方向的光打在鉻金屬上只會看到一個亮點，多方向才能讓鉻金屬的美感完整呈現。"},
+        {label:"④ 環境設定",color:"#A07AC9",keyZh:"純黑工作室背景，讓金屬的鏡面反射最大化顯現",keyEn:"Pure black studio background, maximizing chrome mirror reflection visibility",teach:"鏡面材質的背景要「純黑」——pure black background（純黑背景）讓鉻金屬的鏡面反射最大化；如果背景有顏色或圖案，會反射進鉻金屬表面，干擾整個視覺效果；純黑背景讓光線本身成為唯一反射在金屬上的元素。",joyce:"鏡面材質的背景一定要純黑！Pure black background 讓鉻金屬的鏡面反射最大化，如果背景有顏色會反射進金屬表面干擾視覺——純黑背景讓光線本身成為唯一反射在金屬上的元素，整個效果最純粹最震撼。"},
+        {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"photorealistic, liquid metal, chrome material, 8K render；負向詞：matte surface, cartoon, human skin texture",keyEn:"photorealistic, liquid metal, chrome material, 8K render — Negative: matte surface, cartoon, human skin texture",teach:"液態金屬的技術詞：liquid metal（液態金屬）+ chrome material（鉻金屬材質）是讓 AI 知道材質類型的關鍵組合；負向詞加 matte surface（消光表面）和 human skin texture（人類膚質）防止 AI 把金屬人物生成成消光的機器人或直接生成成有皮膚的人。",joyce:"液態金屬技術詞用 liquid metal + chrome material 組合！負向詞加 matte surface 和 human skin texture——防止 AI 把金屬人物生成成消光機器人或有皮膚的人，這兩個負向詞讓材質感完全到位。"}
+      ]}
+];
+
+// ═══ 組合六大類別 ═══
+const CATS = [
+  CAT_PRODUCT,
+  CAT_PORTRAIT,
+  CAT_SCENE,
+  CAT_ILLUS,
+  CAT_POSTER,
+  Object.assign({}, CAT_CONCEPT, {variants:[...CAT_CONCEPT.variants,...CAT_CONCEPT_EXTRA]})
+];
+
+// ══ 空間場景補充 3 個範例 ══
+CAT_SCENE.variants.push(
+  { title:"賽博霓虹夜店", badge:"都市夜景", ratio:"16:9",
+    keyZh:"都市地下霓虹酒吧，低矮天花板，霓虹燈管裝飾，紫藍紅反射在光滑地面，煙霧瀰漫，深邃神秘氛圍，無人空景",
+    keyEn:"Urban underground neon bar, low ceiling, neon tube decorations, purple blue red reflected on glossy floor, hazy smoke, deep mysterious empty space",
+    fullZh:"空間：都市地下霓虹酒吧，低矮天花板，工業風裸露管線，霓虹燈管裝飾\n色彩：深邃藍紫為底調，霓虹紅和青藍點光源，高對比明暗\n細節：光滑地板完美反射霓虹色彩，吧台散落玻璃杯，煙霧瀰漫\n光線：霓虹燈管本身為唯一光源，彩色點光源製造強烈明暗對比，霧氣讓光暈效果最大化\n氣質：深邃、神秘、都市放縱感，無人空景\n技術：24mm f/2，長時間曝光，高ISO，電影感色調\n負向詞：日光、太亮、人物入鏡、整潔感",
+    fullEn:"Space: Urban underground neon bar, low ceiling, industrial exposed pipes, neon tube decorations\nColors: Deep blue-purple base, neon red and cyan point lights, high contrast\nDetail: Glossy floor perfectly reflecting neon colors, scattered glasses on bar, hazy smoke\nLighting: Neon tubes as only light source, colorful point lights creating strong contrast, haze maximizing glow effect\nMood: Deep, mysterious, urban indulgence, empty space\nTechnical: 24mm f/2, long exposure, high ISO, cinematic grade\nNegative: daylight, too bright, people in frame, clean feel",
+    layers:[
+      {label:"① 空間架構",color:"#3A9E88",keyZh:"都市地下霓虹酒吧，低矮天花板，工業風裸露管線，霓虹燈管裝飾",keyEn:"Urban underground neon bar, low ceiling, industrial exposed pipes, neon tube decorations",teach:"霓虹空間要給「壓迫感的空間特徵」——low ceiling（低矮天花板）和 exposed pipes（裸露管線）製造工業感和壓迫感，是地下酒吧最重要的空間特徵。",joyce:"霓虹空間要有壓迫感！Low ceiling + exposed pipes 製造工業感和壓迫感，讓觀者感受到那種地下、隱藏的空間感。"},
+      {label:"② 細節氛圍",color:"#A8C9A0",keyZh:"光滑地板完美反射霓虹色彩，吧台散落的玻璃杯，煙霧瀰漫",keyEn:"Glossy floor perfectly reflecting neon colors, scattered glasses on bar, hazy smoke",teach:"霓虹空間的「地面反光」是核心視覺元素——glossy floor reflecting neon colors（光滑地板反射霓虹色彩）把地面變成一面鏡子，讓霓虹色彩在空間中翻倍出現。",joyce:"地面反光是霓虹空間的核心！Glossy floor reflecting neon colors 把地面變成鏡子，讓霓虹色彩翻倍出現——這一個細節讓整個場景的精緻感立刻翻倍。"},
+      {label:"③ 光線邏輯",color:"#7A9EC9",keyZh:"霓虹燈管本身為唯一光源，彩色點光源製造強烈明暗對比，霧氣讓光暈效果最大化",keyEn:"Neon tubes as only light source, colorful point lights creating strong contrast, haze maximizing glow effect",teach:"霓虹空間要用「光源即主角」的邏輯——neon tubes as only light source（霓虹燈管本身為唯一光源）讓空間的打光完全來自場景本身；霧氣（haze）讓光暈效果最大化，是霓虹攝影最重要的氛圍元素。",joyce:"霓虹空間的光源就是場景本身！Neon tubes as only light source 讓打光邏輯完全來自場景，霧氣讓光暈效果最大化——這是霓虹場景最重要的打光概念。"},
+      {label:"④ 空間氣質",color:"#A07AC9",keyZh:"深邃、神秘、都市放縱感，無人空景",keyEn:"Deep, mysterious, urban indulgence, empty space no people",teach:"霓虹空間選擇「無人」——無人的霓虹空間讓觀者想像自己是第一個走進去的人，製造強烈的代入感；有人反而會讓觀者的視線分散。",joyce:"霓虹空間選無人！No people 讓觀者想像自己是第一個走進去的人，製造強烈代入感——有人反而讓視線分散，失去那種神秘的探索感。"},
+      {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"24mm f/2，長時間曝光，高ISO；負向詞：日光、太亮、人物入鏡",keyEn:"24mm f/2, long exposure, high ISO — Negative: daylight, too bright, people in frame",teach:"霓虹空間的技術詞：長時間曝光（long exposure）讓霓虹光更柔和有光暈；高 ISO 讓畫面帶有自然噪點增加真實感；f/2 大光圈讓遠處霓虹燈虛化成光球。",joyce:"霓虹空間用長時間曝光！Long exposure 讓霓虹光更柔和有光暈，high ISO 讓畫面帶自然噪點增加真實感，f/2 讓遠處霓虹燈虛化成美麗光球。"}
+    ]},
+  { title:"圖書館晨讀", badge:"文化空間", ratio:"4:5",
+    keyZh:"歐式古典圖書館，高聳木質書架，晨光從高窗斜射而入，光束穿越書架間隙，塵埃在光中飄動，閱讀桌上一杯茶，靜謐無人",
+    keyEn:"European classical library, towering wooden bookshelves, morning light angled through high windows, light beams through shelf gaps, dust floating in light, teacup on reading table, silent",
+    fullZh:"空間：歐式古典圖書館，高聳木質書架延伸至天花板，拱形走廊，鑄鐵扶手欄杆\n細節：閱讀桌上一杯茶，翻開的舊書，鋼筆，書架書脊可見細節\n光線：晨光從高處拱形窗斜射而入，光束穿越書架間隙，塵埃在光中緩慢飄動，其他區域保持昏暗\n氣質：學術、神聖、對知識的崇敬，時光凝止感，靜謐無人\n構圖：寬廣透視構圖，走廊延伸感，光束成為視覺引導線\n技術：24mm f/5.6，高ISO，底片色調，低飽和暖棕\n負向詞：現代感、太亮均勻、凌亂、人物入鏡",
+    fullEn:"Space: European classical library, towering wooden bookshelves reaching ceiling, arched corridors, cast iron railings\nDetails: Teacup on reading table, open old book, fountain pen, book spines visible in detail\nLighting: Morning light angled through high arched windows, light beams through shelf gaps, dust floating slowly in light, other areas remain dim\nMood: Academic, sacred, reverence for knowledge, time frozen, silent\nComposition: Wide perspective, corridor receding, light beams as visual guide lines\nTechnical: 24mm f/5.6, high ISO, film grade, low saturation warm brown\nNegative: modern feel, too bright and even, cluttered, people",
+    layers:[
+      {label:"① 空間架構",color:"#3A9E88",keyZh:"歐式古典圖書館，高聳木質書架延伸至天花板，拱形走廊，鑄鐵扶手欄杆",keyEn:"European classical library, towering wooden bookshelves reaching ceiling, arched corridors, cast iron railings",teach:"古典圖書館的空間感來自「高度和透視」——towering wooden bookshelves reaching ceiling 強調了垂直的高度感；arched corridors（拱形走廊）讓空間有歐式古典建築的標誌性特徵。",joyce:"古典圖書館的震撼感來自高度！Towering wooden bookshelves reaching ceiling 讓書架的高度感出來，arched corridors 帶出歐式古典建築的氣質。"},
+      {label:"② 生活細節",color:"#A8C9A0",keyZh:"閱讀桌上一杯茶，翻開的舊書，鋼筆——有人剛離開的感覺",keyEn:"Teacup on reading table, open old book, fountain pen — as if someone just left",teach:"古典圖書館的道具要「有年代感、有學術感」——fountain pen（鋼筆）和 open old book（翻開的舊書）比現代的電腦和筆記本更有歷史感。",joyce:"古典圖書館的道具要有年代感！鋼筆比原子筆更有學術氣質，翻開的舊書比新書更有歷史感——這些細節讓整個空間有了時間的重量。"},
+      {label:"③ 光線打法",color:"#7A9EC9",keyZh:"晨光從高處拱形窗斜射而入，光束穿越書架間隙，塵埃在光中緩慢飄動，其他區域保持昏暗",keyEn:"Morning light angled through high arched windows, light beams through shelf gaps, dust floating in light, other areas remain dim",teach:"古典圖書館的光線要「局部、有方向、讓其他地方昏暗」——light beams through shelf gaps（光束穿越書架間隙）是最有戲劇性的室內光線效果；other areas remain dim 強調光的局部性，讓光束本身成為主角。",joyce:"古典圖書館的光要局部！光束穿越書架間隙 + 其他區域保持昏暗——這種局部光線的戲劇性讓整個圖書館場景有了神聖感。"},
+      {label:"④ 空間氣質",color:"#A07AC9",keyZh:"學術、神聖、對知識的崇敬，時光凝止感，靜謐無人",keyEn:"Academic, sacred, reverence for knowledge, time frozen, silent",teach:"圖書館的氣質要給「時間感和神聖感」——reverence for knowledge（對知識的崇敬）和 time frozen（時光凝止感）讓整個場景超越「一個放書的地方」，變成有哲學意義的空間。",joyce:"圖書館要有時間感和神聖感！Reverence for knowledge + time frozen 讓整個場景超越「放書的地方」，變成一個有哲學意義的空間。"},
+      {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"24mm f/5.6，高ISO，底片色調，低飽和暖棕；負向詞：現代感、太亮均勻",keyEn:"24mm f/5.6, high ISO, film grade, low saturation warm brown — Negative: modern feel, too bright and even",teach:"古典圖書館的技術詞：高 ISO 讓畫面帶有自然噪點，增加老照片的真實感；低飽和暖棕是老圖書館最正確的色調。",joyce:"古典圖書館用高 ISO + 低飽和暖棕！高 ISO 帶自然噪點增加老照片感，低飽和暖棕是老圖書館最正確的色調——這兩個詞組合讓整個場景充滿歷史厚重感。"}
+    ]},
+  { title:"戶外露營星空", badge:"自然氛圍", ratio:"16:9",
+    keyZh:"山間露營地，帳篷內燈光溫暖，篝火明滅，繁星清晰可見，藍黑夜空，帳篷光暈成視覺焦點，遠方山脈剪影，銀河隱約可見",
+    keyEn:"Mountain campsite, warm tent glow from inside, campfire flickering, clear starry sky, deep blue night sky, tent glow as visual focus, mountain silhouette, Milky Way faintly visible",
+    fullZh:"場景：山間露營地，帳篷紮在草地，篝火在旁\n光線：帳篷內溫暖燈光透出（暖橘色），篝火明滅（暖黃），兩者為僅有的人工光源，星空和月光為冷藍環境光，暖冷色對比強烈\n天空：深邃藍黑夜空，清晰可見的繁星，銀河隱約橫跨，遠方山脈剪影\n氣質：孤獨、壯闊、與自然的連結感，靜謐的夜晚\n構圖：廣角，帳篷在前景三分之一，星空佔上方三分之二\n技術：16mm f/2.8，長時間曝光，高ISO，星空清晰\n負向詞：城市光害、星星模糊、天空太亮、人物入鏡",
+    fullEn:"Scene: Mountain campsite, tent on grass, campfire beside\nLighting: Warm inner tent glow (warm orange), campfire flickering (warm yellow), only two artificial sources, starry sky and moonlight as cool blue ambient, strong warm-cool contrast\nSky: Deep blue-black night sky, clearly visible stars, Milky Way faintly across, mountain silhouettes\nMood: Solitary, vast, connection with nature, silent night\nComposition: Wide angle, tent in front third, starry sky filling upper two thirds\nTechnical: 16mm f/2.8, long exposure, high ISO, sharp stars\nNegative: light pollution, blurry stars, too bright sky, people",
+    layers:[
+      {label:"① 場景設定",color:"#3A9E88",keyZh:"山間露營地，帳篷紮在草地，篝火在旁，遠方山脈剪影",keyEn:"Mountain campsite, tent on grass, campfire beside, mountain silhouettes in distance",teach:"露營夜景的場景設定要「給出前景、中景、背景三層」——帳篷（前景）、草地（中景）、山脈剪影（背景）讓整個畫面有縱深感，不是一個扁平的快照。",joyce:"露營夜景要給三層景深！帳篷前景、草地中景、山脈剪影背景——三層景深讓整個畫面有縱深感，不是扁平的快照。"},
+      {label:"② 光線對比",color:"#A8C9A0",keyZh:"帳篷內溫暖燈光透出（暖橘），篝火明滅（暖黃），星空和月光為冷藍環境光，暖冷色強烈對比",keyEn:"Warm inner tent glow (warm orange), campfire flickering (warm yellow), starry sky moonlight as cool blue ambient, strong warm-cool contrast",teach:"戶外夜景最迷人的是「暖冷色對比」——帳篷和篝火的暖橘色和夜空的冷藍色形成強烈對比，這種暖冷色對比是夜間戶外攝影最美的視覺語言。",joyce:"戶外夜景的魔法是暖冷色對比！帳篷篝火的暖橘色 + 夜空的冷藍色，這種對比是夜間戶外攝影最美的視覺語言。"},
+      {label:"③ 星空細節",color:"#7A9EC9",keyZh:"深邃藍黑夜空，清晰可見的繁星，銀河隱約橫跨，遠方山脈剪影",keyEn:"Deep blue-black night sky, clearly visible stars, Milky Way faintly across, mountain silhouettes",teach:"星空攝影要「指定星空的狀態」——Milky Way faintly visible（銀河隱約可見）讓 AI 知道要生成有銀河但不過度誇張的夜空；mountain silhouettes 讓天空和地面有明確的邊界線。",joyce:"星空攝影要指定星空狀態！Milky Way faintly visible 讓 AI 生成有銀河但不過度誇張的夜空，mountain silhouettes 讓天空和地面有清晰邊界。"},
+      {label:"④ 空間氣質",color:"#A07AC9",keyZh:"孤獨、壯闊、與自然的連結感，靜謐的夜晚",keyEn:"Solitary, vast, connection with nature, silent night",teach:"戶外夜景的氣質要強調「渺小與壯闊的對比」——solitary（孤獨）和 vast（壯闊）的組合讓觀者感受到人在自然中的渺小感，這種情感對比是戶外攝影最有力量的視覺語言。",joyce:"戶外夜景要強調渺小與壯闊的對比！Solitary + vast 讓觀者感受到人在自然中的渺小感，這是戶外攝影最有力量的情感語言。"},
+      {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"16mm f/2.8，長時間曝光，高ISO，星空清晰；負向詞：城市光害、星星模糊",keyEn:"16mm f/2.8, long exposure, high ISO, sharp stars — Negative: light pollution, blurry stars",teach:"星空攝影的技術詞：16mm（超廣角，讓更多天空入鏡）+ long exposure（長時間曝光）+ high ISO（讓星星清晰可見）；負向詞加 light pollution（城市光害）讓 AI 知道要生成真正黑暗的星空。",joyce:"星空攝影技術詞三連：16mm 超廣角 + 長時間曝光 + 高 ISO！三個詞讓 AI 生成清晰可見的繁星，負向詞加 light pollution 讓 AI 生成真正黑暗的星空。"}
+    ]}
+);
+
+// ══ 插畫風格補充 3 個範例 ══
+CAT_ILLUS.variants.push(
+  { title:"扁平品牌插畫", badge:"品牌插畫", ratio:"1:1",
+    keyZh:"現代扁平插畫風格，簡約幾何人物，柔和色塊，乾淨輪廓線，現代品牌美學，無陰影平面設計，鮮豔不刺眼的色盤",
+    keyEn:"Modern flat illustration style, minimal geometric character, soft color blocks, clean outline, modern brand aesthetic, no shadow flat design, vibrant but not harsh palette",
+    fullZh:"風格：現代扁平插畫，簡約幾何造型，品牌插圖風格\n人物：簡化幾何人物，大頭小身比例，圓潤線條，表情簡單親切\n色彩：鮮豔但不刺眼的色盤，互補色搭配，有品牌感\n技術：flat illustration, minimal geometric, vector art style, clean outlines, brand illustration\n負向詞：realistic, photorealistic, detailed shading, complex textures, dark colors",
+    fullEn:"Style: Modern flat illustration, minimal geometric shapes, brand illustration\nCharacter: Simplified geometric person, large head small body, rounded lines, simple friendly expression\nColors: Vibrant but not harsh palette, complementary colors, brand sensibility\nTechnical: flat illustration, minimal geometric, vector art style, clean outlines, brand illustration\nNegative: realistic, photorealistic, detailed shading, complex textures, dark colors",
+    layers:[
+      {label:"① 風格定義",color:"#8B52CC",keyZh:"現代扁平插畫，簡約幾何造型，品牌插圖風格",keyEn:"Modern flat illustration, minimal geometric shapes, brand illustration style",teach:"扁平插畫要強調「幾何簡化」——minimal geometric（簡約幾何）讓 AI 知道要把複雜的形狀簡化成幾何圖形；brand illustration（品牌插圖）讓 AI 知道這是用於品牌應用的插圖，需要有一致性和可辨識性。",joyce:"扁平插畫要強調幾何簡化！Minimal geometric 讓 AI 把複雜形狀簡化成幾何圖形，brand illustration 讓 AI 知道這是品牌用圖。"},
+      {label:"② 人物造型",color:"#A8C9A0",keyZh:"簡化幾何人物，大頭小身比例，圓潤線條，表情簡單親切",keyEn:"Simplified geometric person, large head small body proportion, rounded lines, simple friendly expression",teach:"扁平插畫的人物比例要「卡通化」——large head small body proportion（大頭小身比例）是品牌插畫最常見的可愛比例；rounded lines（圓潤線條）比尖角線條更友善親切。",joyce:"扁平插畫人物要卡通化！大頭小身是可愛公式，圓潤線條比尖角線條更友善親切——這種造型讓品牌吉祥物更討喜。"},
+      {label:"③ 色彩系統",color:"#7A9EC9",keyZh:"鮮豔但不刺眼的色盤，互補色搭配，有品牌感",keyEn:"Vibrant but not harsh palette, complementary color pairing, brand sensibility",teach:"扁平插畫的配色要「鮮豔有品牌感」——vibrant but not harsh（鮮豔但不刺眼）讓 AI 知道要用飽和但不過度刺眼的色彩；complementary color pairing 讓顏色組合有視覺衝擊力但又和諧。",joyce:"扁平插畫配色要鮮豔有品牌感！Vibrant but not harsh 讓 AI 用飽和但不刺眼的色彩，complementary color pairing 讓顏色組合有視覺衝擊力又和諧。"},
+      {label:"④ 技術特徵",color:"#A07AC9",keyZh:"完全平面，無陰影，乾淨輪廓線",keyEn:"Completely flat, no shadows, clean outlines",teach:"扁平插畫要徹底「平面化」——no shadows（無陰影）是扁平設計的核心原則，任何陰影都會破壞扁平感；clean outlines（乾淨輪廓線）讓形狀邊緣清晰。",joyce:"扁平插畫要徹底平面化！No shadows 是扁平設計的核心，任何陰影都破壞扁平感——clean outlines 讓形狀邊緣清晰，是這個風格最重要的視覺特徵。"},
+      {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"flat illustration, minimal geometric, vector art style；負向詞：realistic, detailed shading",keyEn:"flat illustration, minimal geometric, vector art style — Negative: realistic, detailed shading, complex textures",teach:"扁平插畫的負向詞：detailed shading（細膩陰影）和 complex textures（複雜質感）是扁平風格最大的敵人，一定要在負向詞裡明確排除。",joyce:"扁平插畫負向詞一定加 detailed shading 和 complex textures！這兩個是扁平風格最大的敵人，不加的話 AI 很容易給你一個有陰影有質感的「偽扁平」插畫。"}
+    ]},
+  { title:"童書插畫", badge:"兒童插畫", ratio:"4:5",
+    keyZh:"溫馨童書插畫風格，可愛圓潤卡通角色，豐富鮮豔色彩，溫暖筆觸，森林夢幻場景，適合兒童讀物，Quentin Blake 風格",
+    keyEn:"Warm children's book illustration, cute rounded cartoon characters, rich vibrant colors, warm brush strokes, forest fantasy scene, children's book style, Quentin Blake style",
+    fullZh:"風格：溫馨童書插畫，溫暖手繪筆觸，Quentin Blake 或 Beatrix Potter 風格\n角色：可愛圓潤的小動物或兒童角色，大眼睛，簡單可愛的表情\n場景：溫馨森林或夢幻庭園，蘑菇、花朵、小屋\n色彩：豐富鮮豔但溫暖的色彩——橙黃、草綠、天藍、玫瑰粉\n筆觸：溫暖的水彩或色鉛筆質感，輕鬆自然的線條\n技術：children's book illustration, watercolor style, warm colors, cute characters, hand-drawn\n負向詞：dark, scary, realistic, adult themes, cold colors",
+    fullEn:"Style: Warm children's book illustration, warm hand-drawn strokes, Quentin Blake style\nCharacters: Cute rounded small animals or child characters, big eyes, simple cute expressions\nScene: Warm forest or fantasy garden, mushrooms flowers cottages\nColors: Rich vibrant but warm palette — warm orange, grass green, sky blue, rose pink\nTechnical: children's book illustration, watercolor style, warm colors, cute characters, hand-drawn\nNegative: dark, scary, realistic, adult themes, cold colors",
+    layers:[
+      {label:"① 風格定義",color:"#8B52CC",keyZh:"溫馨童書插畫，溫暖手繪筆觸，Quentin Blake 風格",keyEn:"Warm children's book illustration, warm hand-drawn strokes, Quentin Blake style",teach:"童書插畫要點名「風格參考」——Quentin Blake 讓 AI 知道要走那種溫暖、略帶粗糙、充滿生命力的手繪筆觸，比說「可愛插畫」更精準一百倍。",joyce:"童書插畫要點名風格參考！Quentin Blake 讓 AI 知道要走那種溫暖、略帶粗糙、充滿生命力的手繪筆觸——比說可愛插畫精準一百倍。"},
+      {label:"② 角色設計",color:"#A8C9A0",keyZh:"可愛圓潤的小動物或兒童角色，大眼睛，簡單可愛的表情",keyEn:"Cute rounded small animals or child characters, big eyes, simple cute expressions",teach:"童書角色要強調「圓潤感和大眼睛」——rounded（圓潤）讓所有形狀都柔和安全；big eyes（大眼睛）是讓角色顯得可愛和有情感的最有效特徵。",joyce:"童書角色要圓潤有大眼睛！Rounded 讓所有形狀柔和安全，big eyes 是讓角色可愛有情感的最有效特徵——這是童書插畫的視覺語言核心。"},
+      {label:"③ 色彩系統",color:"#7A9EC9",keyZh:"豐富鮮豔但溫暖的色彩——橙黃、草綠、天藍、玫瑰粉",keyEn:"Rich vibrant but warm palette — warm orange, grass green, sky blue, rose pink",teach:"童書插畫的配色要「豐富但溫暖」——vibrant but warm 讓 AI 知道要用鮮豔的色彩，但要偏向暖色調；草綠和天藍是童書最常見的自然色彩，讓場景充滿活力。",joyce:"童書配色要豐富但溫暖！Vibrant but warm 讓 AI 用鮮豔但溫暖的色彩，草綠和天藍是童書最常見的自然色彩，讓整個場景充滿活力和生命感。"},
+      {label:"④ 場景氛圍",color:"#A07AC9",keyZh:"溫馨森林或夢幻庭園，蘑菇、花朵、小屋",keyEn:"Warm forest or fantasy garden, mushrooms flowers cottages",teach:"童書場景要「給出具體的童話元素」——mushrooms（蘑菇）、flowers（花朵）、cottages（小屋）是最通用的童書場景元素，比說「森林場景」更能讓 AI 生成有童書感的場景。",joyce:"童書場景要給具體的童話元素！蘑菇、花朵、小屋是最通用的童書元素，這些具體的名稱讓 AI 知道要生成什麼樣的背景。"},
+      {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"children's book illustration, watercolor style, warm colors；負向詞：dark, scary, realistic",keyEn:"children's book illustration, watercolor style, warm colors — Negative: dark, scary, realistic",teach:"童書插畫的負向詞要明確排除「不適合兒童的元素」：dark（暗沉）、scary（恐怖）是最重要的排除項；realistic（寫實）讓 AI 知道不要生成照片感的圖。",joyce:"童書插畫負向詞一定加 dark、scary 和 realistic！這些是最重要的排除項，確保 AI 生成適合兒童的溫馨插畫。"}
+    ]},
+  { title:"復古旅遊海報", badge:"復古插畫", ratio:"4:5",
+    keyZh:"復古 1950s 旅遊海報風格，平面印刷感，有限色盤（3-4色），粗體衝擊字體，地標性風景，WPA 海報美學，粗糙印刷質感",
+    keyEn:"Vintage 1950s travel poster style, flat print feel, limited color palette (3-4 colors), bold typography, landmark scenery, WPA poster aesthetic, rough print texture",
+    fullZh:"風格：復古 1950 年代旅遊海報，WPA 海報美學\n設計：平面印刷感，有限色盤（3-4色），清晰的顏色分區，網點印刷質感\n景色：地標性城市或自然風景，簡化幾何化的景色表現\n色彩：復古限制色盤——深藍、橙紅、米黃、深棕，印刷油墨感\n技術：vintage travel poster, WPA style, flat graphic, limited palette, retro print\n負向詞：photorealistic, modern design, full color, digital-looking",
+    fullEn:"Style: Vintage 1950s travel poster, WPA aesthetic\nDesign: Flat print feel, limited color palette (3-4 colors), clear color zones, halftone print texture\nScenery: Landmark city or natural scenery, simplified geometric landscape\nColors: Vintage limited palette — deep blue, orange red, warm beige, dark brown\nTechnical: vintage travel poster, WPA style, flat graphic, limited palette, retro print\nNegative: photorealistic, modern design, full color, digital-looking",
+    layers:[
+      {label:"① 風格定義",color:"#8B52CC",keyZh:"復古 1950 年代旅遊海報，WPA 海報美學",keyEn:"Vintage 1950s travel poster, WPA poster aesthetic",teach:"復古插畫要給「具體年代和流派」——1950s 和 WPA 海報美學讓 AI 知道具體的歷史設計語言：平面、幾何化、有限色盤，比說「復古風格」精準十倍。",joyce:"復古插畫要給具體年代和流派！1950s + WPA 海報美學讓 AI 知道具體的歷史設計語言，比說「復古風格」精準十倍。"},
+      {label:"② 印刷特徵",color:"#A8C9A0",keyZh:"平面印刷感，有限色盤（3-4色），清晰的顏色分區，網點印刷質感",keyEn:"Flat print feel, limited color palette (3-4 colors), clear color zones, halftone print texture",teach:"復古印刷插畫要強調「印刷的限制性」——limited color palette (3-4 colors) 是復古印刷的核心特徵；halftone print texture（網點印刷質感）是模擬早期印刷的關鍵。",joyce:"復古印刷插畫要強調印刷的限制性！Limited color palette (3-4 colors) 是復古印刷的核心，halftone texture 模擬那種老印刷質感。"},
+      {label:"③ 色彩系統",color:"#7A9EC9",keyZh:"復古限制色盤——深藍、橙紅、米黃、深棕，印刷油墨感",keyEn:"Vintage limited palette — deep blue, orange red, warm beige, dark brown, printing ink feel",teach:"復古海報的色彩要「有年代感的印刷色調」——深藍、橙紅、米黃是 1950 年代印刷海報最常見的色組，帶有那個年代的美學特徵。",joyce:"復古海報的顏色要有年代感！深藍、橙紅、米黃是 1950 年代印刷海報最常見的色組——這些具體的顏色組合比說「復古色調」更能讓 AI 準確對齊。"},
+      {label:"④ 場景簡化",color:"#A07AC9",keyZh:"地標性城市或自然風景，簡化幾何化的景色表現",keyEn:"Landmark city or natural scenery, simplified geometric landscape representation",teach:"復古海報的景色要「幾何簡化」——simplified geometric（簡化幾何化）讓 AI 知道要把複雜的景色轉化成簡潔的幾何形狀，而不是寫實的照片感。",joyce:"復古海報的景色要幾何簡化！Simplified geometric 讓 AI 把複雜景色轉化成簡潔幾何形狀，不是寫實照片感——這種簡化是復古海報最重要的視覺語言。"},
+      {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"vintage travel poster, WPA style, flat graphic；負向詞：photorealistic, modern design, full color",keyEn:"vintage travel poster, WPA style, flat graphic — Negative: photorealistic, modern design, full color",teach:"復古海報的負向詞：full color（全彩）和 modern design（現代設計）是復古感最大的敵人——要保持有限色盤和年代感，就必須在負向詞裡明確排除。",joyce:"復古海報負向詞一定加 full color 和 modern design！全彩和現代設計是復古感最大的敵人，不加的話 AI 很容易給你一個彩色的現代扁平設計，完全失去年代感。"}
+    ]}
+);
+
+// ══ 文字海報補充 3 個範例 ══
+CAT_POSTER.variants.push(
+  { title:"餐廳菜單封面", badge:"餐飲視覺", ratio:"4:5",
+    keyZh:"高端義式餐廳菜單封面，深綠色背景，燙金標題「La Cucina」，義式食材插畫，橄欖枝香草裝飾，古典優雅排版，奶油紙質感",
+    keyEn:"High-end Italian restaurant menu cover, deep green background, gold foil title \"La Cucina\", Italian ingredient illustrations, olive branch herb decoration, classical elegant layout, cream paper texture",
+    fullZh:"設計：高端義式餐廳菜單封面，古典優雅排版風格\n標題：「La Cucina」（古典義大利體，燙金效果）\n副標：「Authentic Italian Fine Dining」\n插圖：義式食材插畫——橄欖枝、羅勒、番茄、義大利麵\n色彩：深森林綠背景，燙金文字和裝飾線，奶油白副文\n材質感：奶油紙張質感，微微紙紋\n技術：fine dining menu design, gold foil typography, classical layout, elegant illustration\n負向詞：現代風格、廉價感、亮色調、卡通",
+    fullEn:"Design: High-end Italian restaurant menu cover, classical elegant layout\nTitle: \"La Cucina\" (classical Italian typeface, gold foil effect)\nSubtitle: \"Authentic Italian Fine Dining\"\nIllustrations: Italian ingredients — olive branch, basil, tomato, pasta\nColors: Deep forest green background, gold foil text and decorative lines, cream white secondary\nTexture: Cream paper texture, subtle grain\nTechnical: fine dining menu design, gold foil typography, classical layout, elegant illustration\nNegative: modern style, cheap feel, bright colors, cartoon",
+    layers:[
+      {label:"① 設計定位",color:"#D4494A",keyZh:"高端義式餐廳菜單封面，古典優雅排版風格",keyEn:"High-end Italian restaurant menu cover, classical elegant layout",teach:"菜單設計要明確「餐廳等級和風格」——high-end Italian 讓 AI 知道設計語言要走古典歐洲風；menu cover 讓 AI 知道這是一個實體印刷品，需要有印刷感和材質感。",joyce:"菜單設計要明確餐廳等級和風格！High-end Italian 讓 AI 知道設計語言走古典歐洲風，menu cover 讓 AI 知道這是印刷品，需要有材質感。"},
+      {label:"② 文案視覺",color:"#A8C9A0",keyZh:"「La Cucina」古典義大利體，燙金效果；副標「Authentic Italian Fine Dining」",keyEn:"\"La Cucina\" classical Italian typeface, gold foil effect — subtitle: \"Authentic Italian Fine Dining\"",teach:"高端菜單的文字要強調「燙金質感」——gold foil effect 讓文字有實體印刷的高端質感；古典義大利體讓 AI 選用有古典感的字體，不是現代無襯線字體。",joyce:"高端菜單文字要強調燙金質感！Gold foil effect 讓文字有實體印刷的高端質感，古典義大利體讓 AI 選用有古典感的字體。"},
+      {label:"③ 色彩材質",color:"#7A9EC9",keyZh:"深森林綠背景，燙金文字和裝飾線，奶油紙張質感，微微紙紋",keyEn:"Deep forest green background, gold foil text and decorative lines, cream paper texture, subtle paper grain",teach:"高端菜單的色彩要「深色背景配金色文字」——深森林綠是義式餐廳最常見的高端色調；奶油紙張質感讓設計有實體印刷的溫度感，不是螢幕的冷感。",joyce:"高端菜單的色彩公式：深森林綠背景 + 燙金文字！這是義式餐廳最常見的高端配色，再加奶油紙張質感讓設計有實體印刷的溫度感。"},
+      {label:"④ 插圖裝飾",color:"#A07AC9",keyZh:"義式食材插畫——橄欖枝、羅勒、番茄、義大利麵",keyEn:"Italian ingredient illustrations — olive branch, basil, tomato, pasta",teach:"菜單的插圖裝飾要「點名具體食材」——olive branch（橄欖枝）、basil（羅勒）是義式料理最具代表性的食材，這些具體的食材名稱讓 AI 知道要生成什麼樣的插圖。",joyce:"菜單插圖要點名具體食材！橄欖枝、羅勒、番茄是義式料理的代表食材，這些具體的名稱讓 AI 知道要生成什麼樣的插圖——比說「義式裝飾」精準一百倍。"},
+      {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"fine dining menu design, gold foil typography；負向詞：現代風格、廉價感",keyEn:"fine dining menu design, gold foil typography — Negative: modern style, cheap feel",teach:"高端菜單的技術詞：fine dining menu design 這個組合詞讓 AI 知道整個設計語境；負向詞加 modern style 防止 AI 生成現代極簡風格，維持古典感。",joyce:"高端菜單技術詞用 fine dining menu design！這讓 AI 知道整個設計語境，負向詞加 modern style 防止 AI 生成現代極簡風格，維持古典高端感。"}
+    ]},
+  { title:"音樂專輯封面", badge:"音樂視覺", ratio:"1:1",
+    keyZh:"獨立樂團專輯封面，超現實拼貼藝術風格，複古底片質感，大膽幾何構圖，低飽和電影色調，文字設計融入圖像，Hipgnosis 設計美學",
+    keyEn:"Indie band album cover, surrealist collage art style, vintage film texture, bold geometric composition, desaturated cinematic tones, typography integrated into imagery, Hipgnosis design aesthetic",
+    fullZh:"風格：獨立樂團專輯封面，超現實拼貼藝術，達達主義影響\n設計：大膽幾何構圖，不規則形狀，圖像疊加，意象衝突\n色彩：低飽和電影色調——褪色藍、暗橘、米黃，帶底片顆粒\n風格參考：Hipgnosis 設計公司（Pink Floyd 專輯封面），超現實主義\n技術：album cover design, surrealist collage, vintage film grain, cinematic grade\n負向詞：generic, stock photo feel, too clean, obvious, commercial",
+    fullEn:"Style: Indie band album cover, surrealist collage art, Dada influence\nDesign: Bold geometric composition, irregular shapes, image overlay, conflicting imagery\nColors: Desaturated cinematic tones — faded blue, dark orange, warm beige, film grain\nStyle reference: Hipgnosis design studio (Pink Floyd album covers)\nTechnical: album cover design, surrealist collage, vintage film grain, cinematic grade\nNegative: generic, stock photo feel, too clean, obvious, commercial",
+    layers:[
+      {label:"① 設計風格",color:"#D4494A",keyZh:"獨立樂團專輯封面，超現實拼貼藝術，Hipgnosis 設計美學",keyEn:"Indie band album cover, surrealist collage art, Hipgnosis design aesthetic",teach:"音樂專輯封面要給「音樂類型感」——indie band 讓 AI 知道設計語言要走實驗性、非主流；Hipgnosis（Pink Floyd 的專輯封面設計公司）讓 AI 知道要走那種超現實、有哲學感的視覺語言。",joyce:"音樂專輯封面要給音樂類型感！Indie band 讓 AI 知道設計要走實驗性非主流，Hipgnosis 讓視覺語言打破常規——給出音樂類型讓整個設計語言自動對齊。"},
+      {label:"② 構圖邏輯",color:"#A8C9A0",keyZh:"大膽幾何構圖，不規則形狀，圖像疊加，意象衝突",keyEn:"Bold geometric composition, irregular shapes, image overlay, conflicting imagery",teach:"專輯封面的構圖要「打破常規」——conflicting imagery（意象衝突）讓 AI 知道要把不相關的意象放在一起，製造視覺上的不適感和吸引力；這是獨立藝術專輯封面的核心視覺策略。",joyce:"專輯封面的構圖要打破常規！Conflicting imagery 讓 AI 把不相關的意象放在一起，製造視覺上的不適感和吸引力——這是獨立藝術封面最核心的視覺策略。"},
+      {label:"③ 色彩系統",color:"#7A9EC9",keyZh:"低飽和電影色調——褪色藍、暗橘、米黃，帶底片顆粒",keyEn:"Desaturated cinematic tones — faded blue, dark orange, warm beige, film grain",teach:"獨立音樂封面的色調要「低飽和、有年代感」——faded blue（褪色藍）和 dark orange（暗橘）是電影底片的復古色調；film grain 讓整個畫面有類比攝影的真實感。",joyce:"獨立音樂封面色調要低飽和有年代感！褪色藍 + 暗橘是電影底片的復古色調，film grain 讓畫面有類比攝影的真實感——這種色調讓整個封面有藝術感而不是商業感。"},
+      {label:"④ 文字整合",color:"#A07AC9",keyZh:"設計感字體融入圖像，不是單純放在頂部",keyEn:"Design typography integrated into imagery, not simply placed at top",teach:"藝術封面的文字要「成為設計的一部分」——typography integrated into imagery（文字融入圖像）讓字體和視覺元素互相作用，而不是最後加上去的文字。",joyce:"藝術封面的文字要成為設計的一部分！Typography integrated into imagery 讓字體和視覺元素互相作用——文字不是最後加上去的，而是設計的核心。"},
+      {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"album cover design, surrealist collage, vintage film grain；負向詞：generic, stock photo feel",keyEn:"album cover design, surrealist collage, vintage film grain — Negative: generic, stock photo feel, commercial",teach:"音樂封面的負向詞：generic（通用感）和 stock photo feel（庫存照片感）是藝術封面的最大敵人，commercial 讓 AI 知道這不是要做一個廣告，而是一個藝術作品。",joyce:"音樂封面負向詞一定加 generic 和 stock photo feel！通用感和庫存照片感是藝術封面的最大敵人，commercial 讓 AI 知道這不是廣告而是藝術作品。"}
+    ]},
+  { title:"活動邀請卡", badge:"活動設計", ratio:"1:1",
+    keyZh:"高端商業活動邀請卡，深藍金色調，燙金幾何裝飾線，活動標題「SUMMIT 2025」，日期地點資訊，簡潔有力排版，質感印刷感",
+    keyEn:"High-end business event invitation card, deep blue gold palette, gold foil geometric lines, event title \"SUMMIT 2025\", date venue info, clean powerful layout, premium print feel",
+    fullZh:"設計：高端商業活動邀請卡，正方形格式\n標題：「SUMMIT 2025」（現代粗體大寫，白色或金色）\n資訊：「November 15, 2025 · Grand Hyatt Taipei」\n色彩：深海軍藍底，燙金幾何裝飾線，純白文字\n裝飾：精緻燙金幾何線條邊框，角落細節裝飾\n材質感：光澤質感紙張，燙金效果，浮雕感\n技術：event invitation design, gold foil details, luxury print, premium typography\n負向詞：廉價感、卡通感、花花綠綠、亂序排版",
+    fullEn:"Design: High-end business event invitation card, square format\nTitle: \"SUMMIT 2025\" (modern bold uppercase, white or gold)\nInfo: \"November 15, 2025 · Grand Hyatt Taipei\"\nColors: Deep navy base, gold foil geometric lines, pure white text\nDecoration: Delicate gold foil geometric line border, corner ornaments\nTexture: Glossy quality paper, gold foil effect, embossed feel\nTechnical: event invitation design, gold foil details, luxury print, premium typography\nNegative: cheap feel, cartoon, colorful chaos, disorganized",
+    layers:[
+      {label:"① 設計定位",color:"#D4494A",keyZh:"高端商業活動邀請卡，正方形格式",keyEn:"High-end business event invitation card, square format",teach:"邀請卡設計要給「格式和等級」——invitation card 讓 AI 知道這是需要有「正式感」的印刷品；square format 指定了比例，正方形是邀請卡和社群貼文最常見的格式。",joyce:"邀請卡設計要給格式和等級！Invitation card 讓 AI 知道需要有正式感，square format 指定正方形比例——這兩個定位讓整個設計方向清晰。"},
+      {label:"② 文案架構",color:"#A8C9A0",keyZh:"「SUMMIT 2025」現代粗體大寫；資訊：日期地點清楚羅列",keyEn:"\"SUMMIT 2025\" modern bold uppercase — info: date and venue clearly listed",teach:"活動邀請卡的文案要「層次分明、資訊完整」——活動標題大而有力（大寫粗體）；日期地點資訊清楚羅列在次要位置，讓重要資訊一眼可見。",joyce:"邀請卡文案要層次分明、資訊完整！活動標題大而有力，日期地點在次要位置清楚列出——讓重要資訊一眼可見是邀請卡版面設計的最基本原則。"},
+      {label:"③ 色彩材質",color:"#7A9EC9",keyZh:"深海軍藍底，燙金幾何裝飾線，純白文字，光澤質感紙張",keyEn:"Deep navy base, gold foil geometric lines, pure white text, glossy quality paper",teach:"高端邀請卡的材質感要「可以感受到」——glossy quality paper + gold foil effect 讓 AI 知道要生成有實體材質感的設計，讓觀者感受到這個設計的重量和質感。",joyce:"高端邀請卡要強調材質感！Glossy quality paper + gold foil effect 讓 AI 生成有實體材質感的設計，讓觀者感受到那種真實印刷品的重量和質感。"},
+      {label:"④ 裝飾元素",color:"#A07AC9",keyZh:"精緻燙金幾何線條邊框，角落細節裝飾",keyEn:"Delicate gold foil geometric line border, corner detail ornaments",teach:"高端邀請卡的裝飾要「精緻但克制」——delicate geometric line border 和 corner detail ornaments 是高端邀請卡最常見的裝飾元素；精緻但不過度，讓整體設計有品味感。",joyce:"高端邀請卡的裝飾要精緻但克制！精緻幾何線條邊框 + 角落細節裝飾是高端邀請卡最常見的裝飾元素——精緻但不過度，讓整體設計有品味感而不是廉價的花花綠綠。"},
+      {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"event invitation design, gold foil details, luxury print；負向詞：廉價感、卡通感",keyEn:"event invitation design, gold foil details, luxury print — Negative: cheap feel, cartoon",teach:"高端邀請卡的技術詞：luxury print 讓 AI 知道要往最高端的印刷品方向走；負向詞加 cheap feel 和 colorful chaos 讓 AI 避免生成廉價婚慶感的邀請卡。",joyce:"高端邀請卡技術詞用 luxury print！讓 AI 知道要往最高端的印刷品方向走，負向詞加 cheap feel 和 colorful chaos 讓 AI 避免生成廉價婚慶感的邀請卡。"}
+    ]}
+);
+
+// ══ 概念創意補充 3 個範例 ══
+CAT_CONCEPT.variants.push(
+  { title:"時間的重量", badge:"哲學視覺", ratio:"16:9",
+    keyZh:"巨型沙漏漂浮在荒漠廢墟中，沙子化為星辰，廢棄文明在沙漏內部，超現實史詩感，Salvador Dali 風格，photorealistic 極致細節",
+    keyEn:"Giant hourglass floating above desert ruins, sand transforming into stars, abandoned civilization inside hourglass, surrealist epic feel, Salvador Dali style, photorealistic extreme detail",
+    fullZh:"概念：巨型沙漏漂浮在荒漠廢墟上方，沙子化為星辰，時間與文明的視覺比喻\n主體：巨型透明沙漏，漂浮在廢棄沙漠文明廢墟上方，沙漏內部有廢棄的建築和文物，沙子流下時化為繁星\n環境：荒漠廢墟，古老文明遺跡，金色沙塵，史詩感廣角\n光線：戲劇性逆光，沙漏發光，天空在夕陽與星空之間的過渡時刻\n技術：surrealism, photorealistic, Salvador Dali style, epic concept art, extremely detailed, 8K\n負向詞：cartoon, simple, low detail, bright cheerful",
+    fullEn:"Concept: Giant hourglass floating above desert ruins, sand transforming into stars, visual metaphor of time and civilization\nSubject: Giant transparent hourglass floating above abandoned desert civilization, inside contains ruins and artifacts, sand flowing down transforms into stars\nEnvironment: Desert ruins, ancient civilization remnants, golden sand dust, epic wide angle\nLighting: Dramatic backlight, hourglass glowing, sky transitioning between sunset and starry night\nTechnical: surrealism, photorealistic, Salvador Dali style, epic concept art, extremely detailed, 8K\nNegative: cartoon, simple, low detail, bright cheerful",
+    layers:[
+      {label:"① 概念核心",color:"#2E86C1",keyZh:"巨型沙漏漂浮在荒漠廢墟上方，沙子化為星辰，時間與文明的視覺比喻",keyEn:"Giant hourglass floating above desert ruins, sand transforming into stars, visual metaphor of time and civilization",teach:"哲學視覺的概念要「多層比喻」——沙漏（時間）+ 星辰（宇宙/永恆）+ 廢墟（文明的興衰），三個符號同時出現讓概念有深度和複雜性，讓觀者有思考空間。",joyce:"哲學視覺要多層比喻！沙漏代表時間、星辰代表永恆、廢墟代表文明的興衰——三個符號同時出現讓概念有深度，觀者會停下來思考這張圖在說什麼。"},
+      {label:"② 主體設定",color:"#A8C9A0",keyZh:"巨型透明沙漏漂浮在廢棄沙漠文明廢墟上方，沙漏內部有廢棄建築，沙子流下時化為繁星",keyEn:"Giant transparent hourglass floating above abandoned desert, inside contains ruins, sand flowing down transforms into stars",teach:"哲學視覺的主體要「有轉化的過程」——sand flowing down transforms into stars（沙子流下時化為繁星）是這個概念的核心視覺時刻，描述轉化的動態過程比描述靜態的狀態更讓 AI 生成有張力的圖。",joyce:"哲學視覺要描述轉化的過程！Sand flowing down transforms into stars（沙子流下時化為繁星）是這個概念的核心視覺時刻——描述動態轉化比描述靜態狀態更讓 AI 生成有張力的圖。"},
+      {label:"③ 環境史詩感",color:"#7A9EC9",keyZh:"荒漠廢墟，古老文明遺跡，金色沙塵，史詩感廣角",keyEn:"Desert ruins, ancient civilization remnants, golden sand dust, epic wide angle",teach:"史詩感的場景要「廣、空曠、有歷史感」——epic wide angle（史詩感廣角）讓整個場景有電影感；golden sand dust（金色沙塵）讓整個環境有一種神聖的、末世的氛圍。",joyce:"史詩感場景要廣、空曠、有歷史感！Epic wide angle 讓整個場景有電影感，golden sand dust 讓環境有一種神聖的末世氛圍——這兩個詞讓整個場景的規模感和史詩感出來。"},
+      {label:"④ 光線戲劇感",color:"#A07AC9",keyZh:"戲劇性逆光，沙漏發光，天空在夕陽與星空之間的過渡時刻",keyEn:"Dramatic backlight, hourglass glowing, sky transitioning between sunset and starry night",teach:"哲學視覺的光線要「有過渡、有象徵意義」——sky transitioning between sunset and starry night（天空在夕陽與星空之間）描述了一個轉化的時刻，讓光線本身也有象徵意義：白天（生命）正在過渡到夜晚（永恆）。",joyce:"哲學視覺的光線要有象徵意義！天空在夕陽與星空之間的過渡時刻讓光線本身也成為敘事的一部分——白天過渡到夜晚，象徵生命過渡到永恆，這種光線選擇讓整個概念更完整。"},
+      {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"surrealism, photorealistic, Salvador Dali style, 8K；負向詞：cartoon, simple, bright cheerful",keyEn:"surrealism, photorealistic, Salvador Dali style, 8K — Negative: cartoon, simple, bright cheerful",teach:"哲學視覺的技術詞要同時指定「風格參考」和「細節密度」——Salvador Dali style 讓 AI 知道要走超現實主義大師的視覺語言；8K + extremely detailed 讓 AI 知道要生成最高精細度的圖。",joyce:"哲學視覺要同時指定風格參考和細節密度！Salvador Dali style 讓 AI 走超現實主義大師的視覺語言，8K + extremely detailed 讓 AI 生成最高精細度——兩者缺一不可。"}
+    ]},
+  { title:"城市與自然共生", badge:"環境概念", ratio:"16:9",
+    keyZh:"摩天大樓被茂密的雨林植被完全覆蓋，玻璃帷幕透出溫暖燈光，鳥類在叢林摩天樓中飛翔，未來生態都市，surrealistic photorealistic",
+    keyEn:"Skyscrapers completely covered in dense rainforest vegetation, glass curtain walls glowing warm light from within, birds flying through jungle skyscrapers, future ecological city, surrealistic photorealistic",
+    fullZh:"概念：摩天大樓被茂密的雨林植被完全覆蓋，城市與自然共生的未來視覺\n主體：高聳的現代玻璃摩天大樓，外牆被茂密的熱帶雨林植物完全覆蓋，玻璃帷幕透出溫暖的室內燈光\n細節：鳥類在叢林摩天樓間飛翔，瀑布從樓層間流淌，霧氣瀰漫\n色彩：翠綠、深叢林綠、溫暖黃光、霧藍天空\n光線：黃金時刻溫暖光線，窗內燈光透出，霧氣中的光束\n技術：surrealism, photorealistic, biopunk aesthetic, highly detailed, cinematic, 8K\n負向詞：dystopian, dark, gloomy, cartoon, low detail",
+    fullEn:"Concept: Skyscrapers completely covered in dense rainforest vegetation, visual of future city coexisting with nature\nSubject: Towering modern glass skyscrapers, exterior completely covered in dense tropical rainforest plants, glass curtain walls glowing warm interior light\nDetail: Birds flying between jungle skyscrapers, waterfalls flowing between floors, mist permeating\nColors: Emerald green, deep jungle green, warm yellow light, misty blue sky\nLighting: Golden hour warm light, window light shining through, light beams in mist\nTechnical: surrealism, photorealistic, biopunk aesthetic, highly detailed, cinematic, 8K\nNegative: dystopian, dark, gloomy, cartoon, low detail",
+    layers:[
+      {label:"① 概念核心",color:"#2E86C1",keyZh:"摩天大樓被茂密的雨林植被完全覆蓋，城市與自然共生的未來視覺",keyEn:"Skyscrapers completely covered in dense rainforest vegetation, future city coexisting with nature",teach:"城市自然共生的概念要強調「完全覆蓋」——completely covered（完全覆蓋）讓 AI 知道不是少量的綠化裝飾，而是自然完全接管了城市建築，這個強度的融合才有視覺衝擊力。",joyce:"城市自然共生要強調完全覆蓋！Completely covered 讓 AI 知道不是少量綠化裝飾，而是自然完全接管了城市建築——這個強度的融合才有真正的視覺衝擊力和概念力量。"},
+      {label:"② 主體細節",color:"#A8C9A0",keyZh:"高聳玻璃摩天大樓，外牆被熱帶雨林植物完全覆蓋，玻璃帷幕透出溫暖室內燈光",keyEn:"Towering glass skyscrapers, exterior completely covered in tropical rainforest plants, glass curtain walls glowing warm interior light",teach:"城市自然共生的主體要強調「對比元素的共存」——glass curtain walls glowing warm light（玻璃帷幕透出溫暖燈光）讓現代科技感（玻璃、燈光）和自然（雨林植物）在同一個主體上共存，這種對比共存是整個概念的核心。",joyce:"城市自然共生要強調對比元素的共存！玻璃帷幕透出溫暖燈光讓現代科技感和自然在同一個主體上共存——這種對比共存是整個概念最有力量的視覺表達。"},
+      {label:"③ 細節層次",color:"#7A9EC9",keyZh:"鳥類在叢林摩天樓間飛翔，瀑布從樓層間流淌，霧氣瀰漫",keyEn:"Birds flying between jungle skyscrapers, waterfalls flowing between floors, mist permeating",teach:"概念視覺的細節要「讓場景有生命」——birds flying（鳥類飛翔）和 waterfalls flowing between floors（瀑布在樓層間流淌）讓整個場景不是靜止的圖像，而是有生命、有動態的未來世界。",joyce:"概念視覺的細節要讓場景有生命！鳥類飛翔、瀑布在樓層間流淌——這些動態細節讓整個場景不是靜止的圖像，而是有生命力的未來世界，讓觀者想要走進去探索。"},
+      {label:"④ 光線氛圍",color:"#A07AC9",keyZh:"黃金時刻溫暖光線，窗內燈光透出，霧氣中的光束",keyEn:"Golden hour warm light, window light shining through, light beams in mist",teach:"城市自然共生的光線要「溫暖、有希望感」——golden hour warm light（黃金時刻溫暖光線）給整個場景一種美好的、烏托邦式的光線感；光束在霧氣中可見讓整個場景有神聖感和詩意。",joyce:"城市自然共生的光線要溫暖有希望感！Golden hour warm light 給整個場景一種烏托邦式的美好光線感，光束在霧氣中可見讓場景有神聖感和詩意——這是讓概念從批判性變成嚮往性的關鍵光線選擇。"},
+      {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"surrealism, photorealistic, biopunk aesthetic, 8K；負向詞：dystopian, dark, gloomy",keyEn:"surrealism, photorealistic, biopunk aesthetic, 8K — Negative: dystopian, dark, gloomy",teach:"城市自然共生的技術詞：biopunk aesthetic（生物龐克美學）是一個精準的術語，描述「生物科技與自然融合的未來美學」；負向詞加 dystopian（反烏托邦）防止 AI 把這個美好的未來視覺生成成暗沉的末日感。",joyce:"城市自然共生用 biopunk aesthetic！這個術語精準描述「生物科技與自然融合的未來美學」，負向詞加 dystopian 防止 AI 把美好的未來視覺生成成暗沉的末日感——這兩個詞的組合讓整個概念保持正向的烏托邦感。"}
+    ]},
+  { title:"記憶的碎片", badge:"情感概念", ratio:"1:1",
+    keyZh:"破碎的鏡子片在空中漂浮，每片鏡子映照出不同的記憶場景，溫暖光線在鏡面折射，超現實情感視覺，photorealistic 極致細節",
+    keyEn:"Shattered mirror pieces floating in air, each shard reflecting different memory scenes, warm light refracting through mirror surfaces, surrealist emotional visual, photorealistic extreme detail",
+    fullZh:"概念：破碎的鏡子片在空中漂浮，每片映照出不同的記憶場景，記憶與時間的視覺比喻\n主體：玻璃鏡子碎片漂浮在空中，每片鏡子映照出不同的場景（海邊、童年房間、森林），碎片在空中形成漩渦狀排列\n光線：溫暖的金色光線在鏡面折射，彩虹光散射，整體溫暖懷舊\n背景：柔焦的抽象背景，薄霧感，夢境氛圍\n技術：surrealism, photorealistic, reflections, memory aesthetic, extremely detailed\n負向詞：cold, dark, horror, cartoon, simple",
+    fullEn:"Concept: Shattered mirror pieces floating in air, each reflecting different memory scenes, visual metaphor of memory and time\nSubject: Glass mirror shards floating in air, each reflecting different scenes (seaside, childhood room, forest), shards arranged in spiral pattern in air\nLighting: Warm golden light refracting through mirror surfaces, rainbow light scattering, overall warm nostalgic\nBackground: Soft blurred abstract background, misty feel, dreamlike atmosphere\nTechnical: surrealism, photorealistic, reflections, memory aesthetic, extremely detailed\nNegative: cold, dark, horror, cartoon, simple",
+    layers:[
+      {label:"① 概念核心",color:"#2E86C1",keyZh:"破碎的鏡子片在空中漂浮，每片映照出不同的記憶場景，記憶與時間的視覺比喻",keyEn:"Shattered mirror pieces floating in air, each reflecting different memory scenes, visual metaphor of memory and time",teach:"情感概念的核心要「用具體物件代表抽象情感」——shattered mirror（破碎的鏡子）是記憶的完美比喻：記憶是碎片化的、每片都不完整、但每片都映照出真實的過去。用物件代替情感說明讓 AI 更容易理解你要的視覺感。",joyce:"情感概念要用具體物件代表抽象情感！破碎的鏡子是記憶的完美比喻——記憶是碎片化的、每片都不完整、但每片都映照出真實的過去。這種物件與情感的對應讓 AI 更容易理解你要的視覺。"},
+      {label:"② 主體設定",color:"#A8C9A0",keyZh:"玻璃鏡子碎片漂浮在空中，每片映照出不同場景，碎片形成漩渦狀排列",keyEn:"Glass mirror shards floating in air, each reflecting different scenes, shards arranged in spiral pattern",teach:"情感視覺的主體設定要「給碎片一個排列邏輯」——spiral pattern（漩渦狀排列）讓碎片不是隨機漂浮的，而是有一個中心，有一個流動的方向，讓觀者的視線有引導。",joyce:"情感視覺的碎片要有排列邏輯！Spiral pattern（漩渦狀排列）讓碎片有中心和流動方向，讓觀者的視線有引導——隨機漂浮的碎片沒有力量，有邏輯的排列才有情感張力。"},
+      {label:"③ 光線折射",color:"#7A9EC9",keyZh:"溫暖的金色光線在鏡面折射，彩虹光散射，整體溫暖懷舊",keyEn:"Warm golden light refracting through mirror surfaces, rainbow light scattering, overall warm nostalgic",teach:"鏡面折射的光線要「溫暖、有彩虹感」——warm golden light refracting（溫暖金色光線在鏡面折射）配合 rainbow light scattering（彩虹光散射）讓整個場景充滿光的魔法感；整體溫暖懷舊的色調讓情感從「悲傷的失落」變成「溫柔的回憶」。",joyce:"鏡面折射的光線要溫暖有彩虹感！溫暖金色光線折射 + 彩虹光散射讓整個場景充滿光的魔法感——溫暖懷舊的色調讓情感從悲傷的失落變成溫柔的回憶，這個色調選擇直接影響整個概念的情感調性。"},
+      {label:"④ 背景氛圍",color:"#A07AC9",keyZh:"柔焦的抽象背景，薄霧感，夢境氛圍",keyEn:"Soft blurred abstract background, misty feel, dreamlike atmosphere",teach:"情感概念的背景要「模糊、不具體」——soft blurred abstract background（柔焦的抽象背景）讓背景不搶戲，讓觀者的注意力完全集中在漂浮的鏡子碎片上；薄霧感（misty feel）讓整個場景有夢境的不真實感。",joyce:"情感概念的背景要模糊不具體！Soft blurred abstract background 讓觀者的注意力完全集中在鏡子碎片上，薄霧感讓整個場景有夢境的不真實感——這種背景選擇讓主體更突出，情感更純粹。"},
+      {label:"⑤ 技術標籤",color:"#C97A7A",keyZh:"surrealism, photorealistic, reflections, memory aesthetic；負向詞：cold, dark, horror",keyEn:"surrealism, photorealistic, reflections, memory aesthetic — Negative: cold, dark, horror",teach:"情感概念的技術詞：memory aesthetic（記憶美學）是一個精準的氛圍詞，讓 AI 知道整個場景要有懷舊感、溫柔感；負向詞加 horror（恐怖）和 dark（暗沉）防止 AI 把破碎鏡子這個意象生成成恐怖電影感的場景。",joyce:"情感概念用 memory aesthetic！這個氛圍詞讓 AI 知道整個場景要有懷舊感和溫柔感，負向詞加 horror 和 dark 防止 AI 把破碎鏡子生成成恐怖電影感——這個保護很重要，破碎鏡子很容易跑偏到恐怖方向。"}
+    ]}
+);
+
+
+// ═══ State ═══════════════════════════════════
+let S={view:"home",catId:null,varIdx:0,layerIdx:-1,lang:"zh",copied:false,expanded:false,ratio:null,saved:new Set()};
+const set=p=>{S={...S,...p};render();};
+
+// ═══ Audio ═══════════════════════════════════
+let AC=null;
+const ac=()=>{if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();return AC;};
+function tone(f,d,t="sine",v=.1){try{const c=ac();if(c.state==="suspended")c.resume();const o=c.createOscillator(),g=c.createGain();o.type=t;o.frequency.value=f;o.connect(g);g.connect(c.destination);const n=c.currentTime;g.gain.setValueAtTime(0,n);g.gain.linearRampToValueAtTime(v,n+.01);g.gain.exponentialRampToValueAtTime(.0001,n+d);o.start(n);o.stop(n+d+.02);}catch(e){}}
+const sfx={
+  click:()=>tone(660,.07,"triangle",.09),
+  reveal:()=>{[520,660,780].forEach((f,i)=>setTimeout(()=>tone(f,.16,"sine",.09),i*75));},
+  copy:()=>{[600,750,900,1100].forEach((f,i)=>setTimeout(()=>tone(f,.11,"triangle",.09),i*60));},
+  save:()=>{[880,1100].forEach((f,i)=>setTimeout(()=>tone(f,.14,"sine",.1),i*90));}
+};
+
+// ═══ Copy ════════════════════════════════════
+async function copyText(txt){
+  let ok=false;
+  try{await navigator.clipboard.writeText(txt);ok=true;}catch(e){}
+  if(!ok){try{const t=document.createElement("textarea");t.value=txt;t.style.cssText="position:fixed;opacity:0";document.body.appendChild(t);t.select();ok=document.execCommand("copy");document.body.removeChild(t);}catch(e){}}
+  if(ok){sfx.copy();set({copied:true});setTimeout(()=>set({copied:false}),2200);}
+}
+
+// ═══ Design tokens ════════════════════════════
+const T={
+  pageBg:"#F5F3EE",cardBg:"#FFFFFF",ink:"#1A1614",inkSoft:"#6B6460",inkMuted:"#A09890",
+  border:"#E8E2D8",accent:"#FF6B4A",tagBg:"#F0EDE8",tagText:"#8A8480",
+  fB:`system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif`,
+  fM:`"SF Mono","JetBrains Mono",ui-monospace,monospace`,
+};
+const CAT_LIGHT={product:"#C9874A",portrait:"#4A8FC9",scene:"#3A9E88",illustration:"#8B52CC",poster:"#D4494A",concept:"#2E86C1"};
+const CAT_PALE= {product:"#FDF6EC",portrait:"#EEF4FC",scene:"#EEF8F5",illustration:"#F5F0FC",poster:"#FEF0F0",concept:"#EAF4FB"};
+
+// ═══ Helpers ═════════════════════════════════
+function hexRgb(h){const r=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h);return r?`${parseInt(r[1],16)},${parseInt(r[2],16)},${parseInt(r[3],16)}`:"80,80,80";}
+function currentRatio(cat,v){return S.ratio||v.ratio||cat.ratios[0];}
+
+// ═══ Render ═════════════════════════════════
+const root=document.getElementById("root");
+function render(){root.innerHTML=S.view==="home"?buildHome():buildCat();bind();}
+
+// ═══ Home ════════════════════════════════════
+function buildHome(){
+  return`
+<div style="background:${T.pageBg};min-height:100vh;font-family:${T.fB}">
+<div style="max-width:1100px;margin:0 auto;padding:48px 22px 80px">
+
+  <!-- Header -->
+  <div style="text-align:center;margin-bottom:52px">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:#fff;border:1.5px solid ${T.border};border-radius:20px;padding:7px 18px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+      <span style="font-size:11px;font-family:${T.fM};color:${T.accent};font-weight:700;letter-spacing:2px">JOYCE's VISUAL RECIPE</span>
+    </div><br/>
+    <div style="font-size:clamp(32px,5.5vw,56px);font-weight:900;line-height:1.18;margin-bottom:14px;background:linear-gradient(90deg,#B8621A,#B82860,#6B3BB8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline-block">AI 視覺小幫手</div>
+    <p style="color:${T.inkSoft};font-size:16px;line-height:1.8;max-width:480px;margin:0 auto">
+      六大類別 · 五層拆解教學
+    </p>
+  </div>
+
+  <!-- Cards -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+    ${CATS.map(c=>`
+    <button class="cc" data-id="${c.id}"
+      style="background:#fff;border:1.5px solid ${T.border};border-radius:16px;overflow:hidden;text-align:left;cursor:pointer;transition:all .2s;display:flex;flex-direction:row;padding:0;box-shadow:0 2px 10px rgba(0,0,0,.05);min-height:148px">
+      <!-- 左色塊 -->
+      <div style="width:96px;flex-shrink:0;background:${CAT_LIGHT[c.id]};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px 8px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-18px;right:-18px;width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.15)"></div>
+        <div style="position:absolute;bottom:-12px;left:-12px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12)"></div>
+        <div style="position:relative;filter:drop-shadow(0 2px 8px rgba(0,0,0,.2))">${c.icon}</div>
+        <div style="font-size:9px;font-family:${T.fM};color:rgba(255,255,255,.85);font-weight:700;position:relative;letter-spacing:.5px">${c.ratios[0]}</div>
+      </div>
+      <!-- 右內容 -->
+      <div style="flex:1;display:flex;flex-direction:column;padding:16px 16px 0;min-width:0">
+        <div style="font-size:18px;font-weight:800;color:${T.ink};margin-bottom:3px">${c.name}</div>
+        <div style="font-size:12px;font-family:${T.fM};color:${CAT_LIGHT[c.id]};margin-bottom:7px">${c.nameEn}</div>
+        <div style="font-size:13px;color:${T.inkSoft};line-height:1.55;margin-bottom:10px">${c.tagline}</div>
+        <div style="margin-top:auto;padding:10px 0;border-top:1px solid ${T.border};display:flex;justify-content:flex-end;align-items:center">
+          <div style="font-size:12.5px;color:${CAT_LIGHT[c.id]};font-weight:800">看配方 →</div>
+        </div>
+      </div>
+    </button>`).join("")}
+  </div>
+
+  <!-- Footer -->
+  <div style="margin-top:44px;text-align:center;border:1.5px solid ${T.border};border-radius:14px;padding:18px;background:#fff">
+    <div style="font-size:13px;color:${T.inkMuted};line-height:1.9">
+      五層拆解教學 · 繁中 / EN 雙語切換 · 比例切換 · 可折疊預覽 · 一鍵複製
+    </div>
+  </div>
+</div>
+</div>`;
+}
+
+// ═══ Category ════════════════════════════════
+function buildCat(){
+  const cat=CATS.find(c=>c.id===S.catId);if(!cat)return buildHome();
+  const accent=CAT_LIGHT[cat.id];
+  const pale=CAT_PALE[cat.id];
+  const v=cat.variants[S.varIdx];
+  const li=S.layerIdx;
+  const isDone=li>=v.layers.length-1&&li>=0;
+  const prog=li<0?0:Math.round(((li+1)/v.layers.length)*100);
+  const curRatio=currentRatio(cat,v);
+  const savedKey=`${cat.id}-${S.varIdx}`;
+  const isSaved=S.saved.has(savedKey);
+
+  function joyceBubble(text,ac2,isEnd=false){
+    const bc=isEnd?"#3A9E88":ac2;
+    return`<div class="bounce-in" style="display:flex;align-items:flex-end;gap:10px;margin-bottom:14px">
+      <div style="width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid ${bc}55;box-shadow:0 0 12px ${bc}22">
+        <img src="${JOYCE_IMG}" style="width:100%;height:100%;object-fit:cover;object-position:center 10%" alt="Joyce"/>
+      </div>
+      <div style="background:#fff;border:1.5px solid ${bc}40;border-radius:14px 14px 14px 3px;padding:11px 14px;flex:1;box-shadow:0 2px 10px rgba(0,0,0,.06)">
+        <div style="font-size:9.5px;color:${bc};font-weight:800;margin-bottom:5px;letter-spacing:.5px;font-family:${T.fM}">喬伊思說</div>
+        <div style="font-size:13px;color:${T.ink};line-height:1.65">${text}</div>
+      </div>
+    </div>`;
+  }
+
+  function buildPreview(){
+    if(li<0)return`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:180px;gap:10px">
+      <div style="font-size:28px;opacity:.2">🔒</div>
+      <div style="font-size:12.5px;color:${T.inkMuted};text-align:center">點右側「開始解鎖」揭開配方</div>
+    </div>`;
+    const rows=v.layers.slice(0,li+1).map((l,i)=>`
+      <div style="margin-bottom:8px;padding:9px 11px;border-radius:8px;background:${i===li?pale:"#F8F6F2"};border-left:2.5px solid ${l.color}">
+        <div style="font-size:9px;color:${l.color};letter-spacing:.5px;margin-bottom:3px;font-family:${T.fM};font-weight:700">${l.label}</div>
+        <div style="font-size:11.5px;color:${i===li?T.ink:T.inkSoft};line-height:1.6;font-family:${T.fM}">${S.lang==="zh"?l.keyZh:l.keyEn}</div>
+      </div>`).join("");
+    const full=S.expanded?`<div style="margin-top:12px;padding-top:12px;border-top:1.5px solid ${T.border}">
+      <div style="font-size:9.5px;color:${T.inkMuted};margin-bottom:7px;font-family:${T.fM};letter-spacing:.5px">FULL PROMPT</div>
+      <div style="font-size:11px;color:${T.inkSoft};white-space:pre-wrap;line-height:1.7;font-family:${T.fM}">${(S.lang==="zh"?v.fullZh:v.fullEn).replace(/</g,"&lt;")}</div>
+    </div>`:"";
+    return rows+full;
+  }
+
+  function buildLayers(){
+    if(li<0)return`
+      ${joyceBubble(`這是「<strong style="color:${T.ink}">${cat.name}</strong>」的 ${v.title} 配方。包含五個關鍵元素，一層一層打開，你就學會了。`,accent)}
+      <div style="text-align:center;padding:24px 16px">
+        <button id="btn-start" style="background:${accent};border:none;color:#fff;padding:13px 26px;border-radius:13px;font-weight:800;font-size:15.5px;display:inline-flex;align-items:center;gap:9px;box-shadow:0 6px 20px rgba(${hexRgb(accent)},.3)">開始解鎖配方 →</button>
+      </div>`;
+    return v.layers.map((l,i)=>{
+      const unlocked=i<=li,isCur=i===li,isNext=i===li+1&&!isDone;
+      return`<div style="border-radius:12px;padding:${unlocked?"15px":"12px"} 14px;background:${isCur?pale:unlocked?"#fff":"#F8F6F2"};border:1.5px solid ${isCur?l.color+"55":unlocked?T.border:"#EDE8E2"};opacity:${unlocked?1:.35};transition:all .3s;box-shadow:${isCur?"0 4px 14px rgba(0,0,0,.06)":"none"}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${unlocked?"10px":"0"}">
+          <div style="font-weight:800;font-size:13.5px;color:${unlocked?l.color:T.inkMuted}">${l.label}</div>
+          ${!unlocked&&isNext?`<button class="btn-next" style="background:${accent};border:none;color:#fff;padding:6px 13px;border-radius:7px;font-weight:800;font-size:12px;box-shadow:0 3px 10px rgba(${hexRgb(accent)},.25)">解開 →</button>`:""}
+          ${unlocked&&!isCur?`<div style="font-size:10.5px;color:${T.inkMuted}">✓</div>`:""}
+        </div>
+        ${unlocked?`
+          ${isCur?joyceBubble(l.joyce,l.color):""}
+          <div style="font-family:${T.fM};font-size:11px;color:${T.inkSoft};background:#F5F2EC;border-radius:7px;padding:8px 10px;margin-bottom:9px;line-height:1.6;border-left:2px solid ${l.color}44">${S.lang==="zh"?l.keyZh:l.keyEn}</div>
+          <div style="font-size:13px;color:${T.inkSoft};line-height:1.7">${l.teach}</div>
+          ${isCur&&!isDone?`<div style="margin-top:11px"><button class="btn-next" style="background:${accent};border:none;color:#fff;padding:9px 16px;border-radius:9px;font-weight:800;font-size:13.5px;display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(${hexRgb(accent)},.28)">下一個元素 →</button></div>`:""}
+          ${isCur&&isDone?`<div style="margin-top:12px">${joyceBubble("五層全部解鎖！現在你懂這套配方了。複製完整版，貼到你的 AI 生圖工具試試看！",accent,true)}</div>`:""}
+        `:""}
+      </div>`;
+    }).join("")
+    +(isDone?`
+      <button id="btn-copy-b" style="width:100%;padding:14px;border-radius:13px;border:none;background:${accent};color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 6px 20px rgba(${hexRgb(accent)},.3);margin-top:4px">${S.copied?"✓ 已複製到剪貼簿！":"📋 複製完整提示詞"}</button>
+      <button id="btn-back-b" style="width:100%;padding:12px;border-radius:13px;border:1.5px solid ${T.border};background:#fff;color:${T.inkSoft};font-weight:700;font-size:14px;margin-top:8px">← 返回首頁</button>`:"");
+  }
+
+  return`
+<div style="background:${T.pageBg};min-height:100vh;font-family:${T.fB}">
+<div style="max-width:1100px;margin:0 auto;padding:28px 20px 72px">
+
+  <!-- Nav -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px;flex-wrap:wrap">
+    <button id="btn-home" style="background:#fff;border:1.5px solid ${T.border};color:${T.inkSoft};padding:7px 14px;border-radius:9px;font-size:13px;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.06)">← 返回</button>
+    <div style="width:3px;height:3px;border-radius:50%;background:${T.border}"></div>
+    <div>
+      <div style="font-weight:800;font-size:16px;color:${T.ink}">${cat.name}</div>
+      <div style="font-size:10px;font-family:${T.fM};color:${accent}">${cat.nameEn}</div>
+    </div>
+    <!-- 範例切換 3+3 grid -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:4px">
+      ${cat.variants.map((vv,i)=>`<button class="var-btn" data-idx="${i}"
+        style="padding:6px 8px;border-radius:8px;font-size:12px;font-weight:700;border:1.5px solid ${i===S.varIdx?accent:T.border};background:${i===S.varIdx?pale:"#fff"};color:${i===S.varIdx?accent:T.inkSoft};transition:all .18s;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${vv.title}</button>`).join("")}
+    </div>
+    <!-- 語言 + 收藏 -->
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <button id="btn-save" title="${isSaved?"取消收藏":"收藏此配方"}" style="width:34px;height:34px;border-radius:8px;border:1.5px solid ${isSaved?accent:T.border};background:${isSaved?pale:"#fff"};color:${isSaved?accent:T.inkMuted};font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s">${isSaved?"♥":"♡"}</button>
+      <div style="display:flex;background:#fff;border:1.5px solid ${T.border};border-radius:9px;padding:3px;gap:2px;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+        ${["zh","en"].map(l=>`<button class="lang-btn" data-lang="${l}"
+          style="padding:5px 12px;border-radius:6px;border:none;font-size:12.5px;font-weight:700;background:${S.lang===l?accent:"transparent"};color:${S.lang===l?"#fff":T.inkSoft};transition:all .18s">${l==="zh"?"繁中":"EN"}</button>`).join("")}
+      </div>
+    </div>
+  </div>
+
+  <!-- 比例切換 -->
+  <div style="display:flex;gap:6px;margin-bottom:18px;align-items:center">
+    <div style="font-size:11px;color:${T.inkMuted};font-family:${T.fM};margin-right:4px">比例</div>
+    ${cat.ratios.map(r=>`<button class="ratio-btn" data-ratio="${r}"
+      style="padding:4px 12px;border-radius:7px;font-size:11.5px;font-weight:700;border:1.5px solid ${curRatio===r?accent:T.border};background:${curRatio===r?pale:"#fff"};color:${curRatio===r?accent:T.inkMuted};font-family:${T.fM};transition:all .18s">${r}</button>`).join("")}
+    <div style="font-size:11px;color:${T.inkMuted};margin-left:4px">· 此類別建議比例</div>
+  </div>
+
+  <!-- 進度條 -->
+  ${li>=0?`<div style="margin-bottom:18px;display:flex;align-items:center;gap:10px">
+    <div style="flex:1;height:4px;background:${T.border};border-radius:2px;overflow:hidden">
+      <div style="height:100%;width:${prog}%;background:${accent};transition:width .4s ease;border-radius:2px"></div>
+    </div>
+    <div style="font-size:10.5px;color:${accent};font-weight:800;font-family:${T.fM};flex-shrink:0">${li+1}/${v.layers.length} 層已解鎖</div>
+  </div>`:""}
+
+  <!-- 主網格 -->
+  <div id="main-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+
+    <!-- 左：提示詞預覽 -->
+    <div style="position:sticky;top:20px">
+      <div style="background:#fff;border:1.5px solid ${T.border};border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06)">
+        <div style="height:4px;background:${accent}"></div>
+        <div style="padding:12px 16px;border-bottom:1px solid ${T.border};display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+          <div>
+            <div style="font-family:${T.fM};font-size:9.5px;color:${accent};letter-spacing:1.5px;font-weight:700">${li<0?"🔒 LOCKED":isDone?"✓ UNLOCKED":"⟳ REVEALING..."}</div>
+            <div style="font-size:11px;font-weight:700;color:${T.ink};margin-top:2px">${v.title} <span style="color:${T.inkMuted};font-weight:400">· ${v.badge}</span></div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            ${li>=0?`<button id="btn-exp" style="background:${T.tagBg};border:1px solid ${T.border};color:${T.inkSoft};padding:5px 10px;border-radius:6px;font-size:10.5px;font-weight:600">${S.expanded?"▲ 收合":"▼ 完整版"}</button>`:""}
+            ${isDone?`<button id="btn-copy" style="background:${accent};border:none;color:#fff;padding:6px 12px;border-radius:7px;font-weight:800;font-size:11px">${S.copied?"✓ 已複製":"複製提示詞"}</button>`:""}
+          </div>
+        </div>
+        <div style="padding:14px 16px;min-height:200px">${buildPreview()}</div>
+      </div>
+      <!-- 比例標示 -->
+      <div style="margin-top:9px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:10.5px;padding:4px 10px;border-radius:7px;background:${pale};color:${accent};border:1px solid ${accent}44;font-weight:800">目前比例 ${curRatio}</span>
+        ${isSaved?`<span style="font-size:10.5px;color:${accent};font-weight:700">♥ 已收藏</span>`:""}
+      </div>
+    </div>
+
+    <!-- 右：拆解 -->
+    <div style="display:flex;flex-direction:column;gap:9px">${buildLayers()}</div>
+  </div>
+
+  <!-- 底部返回按鈕（未完成時也顯示） -->
+  ${!isDone?`<div style="margin-top:40px;text-align:center">
+    <button id="btn-home-b" style="background:#fff;border:1.5px solid ${T.border};color:${T.inkSoft};padding:11px 24px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.06)">← 返回首頁</button>
+  </div>`:""}
+
+</div>
+</div>
+<style>
+@media(max-width:680px){#main-grid{grid-template-columns:1fr!important}#main-grid>div:first-child{position:static!important}}
+button:hover{opacity:.88}
+</style>`;
+}
+
+// ═══ Events ══════════════════════════════════
+function bind(){
+  document.querySelectorAll(".cc").forEach(b=>{
+    b.addEventListener("click",()=>{sfx.click();set({view:"category",catId:b.dataset.id,varIdx:0,layerIdx:-1,copied:false,expanded:false,ratio:null});});
+    b.addEventListener("mouseenter",()=>{b.style.transform="translateY(-3px)";b.style.boxShadow="0 10px 26px rgba(0,0,0,.1)";});
+    b.addEventListener("mouseleave",()=>{b.style.transform="";b.style.boxShadow="0 2px 10px rgba(0,0,0,.05)";});
+  });
+  ["btn-home","btn-home-b","btn-back-b"].forEach(id=>{
+    const b=document.getElementById(id);if(b)b.addEventListener("click",()=>{sfx.click();set({view:"home"});});
+  });
+  const sb=document.getElementById("btn-start");if(sb)sb.addEventListener("click",()=>{sfx.reveal();set({layerIdx:0});});
+  document.querySelectorAll(".btn-next").forEach(b=>b.addEventListener("click",()=>{
+    const cat=CATS.find(c=>c.id===S.catId);
+    const nxt=S.layerIdx+1;
+    if(nxt<cat.variants[S.varIdx].layers.length){sfx.reveal();set({layerIdx:nxt});}
+  }));
+  document.querySelectorAll(".lang-btn").forEach(b=>b.addEventListener("click",()=>{sfx.click();set({lang:b.dataset.lang});}));
+  document.querySelectorAll(".var-btn").forEach(b=>b.addEventListener("click",()=>{sfx.click();set({varIdx:+b.dataset.idx,layerIdx:-1,copied:false,expanded:false,ratio:null});}));
+  document.querySelectorAll(".ratio-btn").forEach(b=>b.addEventListener("click",()=>{sfx.click();set({ratio:b.dataset.ratio});}));
+  const eb=document.getElementById("btn-exp");if(eb)eb.addEventListener("click",()=>{sfx.click();set({expanded:!S.expanded});});
+  const saveb=document.getElementById("btn-save");if(saveb)saveb.addEventListener("click",()=>{
+    const key=`${S.catId}-${S.varIdx}`;
+    const newSaved=new Set(S.saved);
+    if(newSaved.has(key)){newSaved.delete(key);}else{newSaved.add(key);sfx.save();}
+    set({saved:newSaved});
+  });
+  ["btn-copy","btn-copy-b"].forEach(id=>{
+    const b=document.getElementById(id);if(!b)return;
+    b.addEventListener("click",()=>{
+      const cat=CATS.find(c=>c.id===S.catId);
+      const v=cat?.variants[S.varIdx];
+      if(v)copyText(S.lang==="zh"?v.fullZh:v.fullEn);
+    });
+  });
+}
+
+render();
+</script>
+</body>
+</html>
